@@ -38,5 +38,13 @@ console.log('after import:', JSON.stringify(ents)); assert(ents.some(e => e[0] =
 await pg.screenshot({ path: `${shots}/value.png` });
 await pg.click('.tabs [data-tab=binder]'); await pg.click('#view-seg [data-v=pages]'); await new Promise(r => setTimeout(r, 2500)); await pg.screenshot({ path: `${shots}/binder-pages.png` });
 await pg.click('#view-seg [data-v=list]'); await new Promise(r => setTimeout(r, 1500)); await pg.screenshot({ path: `${shots}/binder-list.png` });
+// binder page: 3x3 photo through the Photo picker
+await pg.click('.tabs [data-tab=scan]'); await pg.click('#mode-seg [data-mode=grid3]');
+const before = await pg.evaluate(() => __app.binder.totals().count);
+const fi = await pg.$('#file-in'); await fi.uploadFile(process.env.GRID || 'bench/scenes/g3_002.jpg');
+await pg.waitForFunction(b => __app.binder.totals().count >= b + 7, { timeout: 90000 }, before).catch(() => {});
+const added = (await pg.evaluate(() => __app.binder.totals().count)) - before; console.log('3x3 page added:', added, '|', await pg.$eval('#scan-status', e => e.textContent));
+assert(added >= 7, 'binder page scan');
+await new Promise(r => setTimeout(r, 1500)); await pg.screenshot({ path: `${shots}/scan-3x3.png` });
 console.log('errors:', errs.filter(e => !/favicon|404/.test(e)));
 await br.close(); srv.kill(); console.log('E2E OK');
