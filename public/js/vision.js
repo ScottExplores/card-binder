@@ -77,6 +77,13 @@ export function detectCards(cv, src, { maxCards = 9, minAreaFrac = 0.02 } = {}) 
   // non-max suppression: drop quads whose center lies inside a bigger kept quad... prefer the largest
   // non-nested; but a sleeve gives nested quads (sleeve + card) - keep the outer if similar size (>80%).
   cands.sort((a, b) => b.area - a.area);
+  const ctrOf = q => [q.reduce((s, p) => s + p[0], 0) / 4, q.reduce((s, p) => s + p[1], 0) / 4];
+  const insideQ = (pt, q) => { let s = 0; for (let i = 0; i < 4; i++) { const a = q[i], b = q[(i + 1) % 4]; s += Math.sign((b[0] - a[0]) * (pt[1] - a[1]) - (b[1] - a[1]) * (pt[0] - a[0])); } return Math.abs(s) === 4; };
+  if (maxCards > 3) { // binder mode: a quad holding several card-sized quads is the page, not a card
+    const drop = new Set();
+    for (const c of cands) { const inner = cands.filter(o => o !== c && o.area < c.area * 0.5 && o.area > c.area * 0.04 && insideQ(ctrOf(o.quad), c.quad)); const distinct = []; for (const o of inner) if (!distinct.some(d => insideQ(ctrOf(o.quad), d.quad) || insideQ(ctrOf(d.quad), o.quad))) distinct.push(o); if (distinct.length >= 2) drop.add(c); }
+    for (let i = cands.length - 1; i >= 0; i--) if (drop.has(cands[i])) cands.splice(i, 1);
+  }
   const kept = [];
   const center = q => [q.reduce((s, p) => s + p[0], 0) / 4, q.reduce((s, p) => s + p[1], 0) / 4];
   const inside = (pt, q) => { let s = 0; for (let i = 0; i < 4; i++) { const a = q[i], b = q[(i + 1) % 4]; const c = (b[0] - a[0]) * (pt[1] - a[1]) - (b[1] - a[1]) * (pt[0] - a[0]); s += Math.sign(c); } return Math.abs(s) === 4; };

@@ -1,299 +1,472 @@
 [
  {
-  "file": "scenes/s004.jpg",
+  "file": "scenes/g3_000.jpg",
   "slot": 0,
-  "want": "Land Cap",
-  "got": "Terminate",
-  "ocr": "vo | TR irae | oR I | tL | Mmm ne | Pr a          SETI",
-  "det": true,
-  "ns": 0.4444444444444444
+  "want": "Vampire Bats",
+  "got": "Bog Imp",
+  "ocr": "TREN SSIS ATES FLAS mar a ma | I | I | SRL ey | EE | TE I GR IE A SRC mim | J El a TT - | a            , | m   Spl mo a pha | Boe I PRE ead Ries",
+  "det": false,
+  "ns": 0.47428571428571425,
+  "sim": 0.4548518218105883
  },
  {
-  "file": "scenes/s007.jpg",
-  "slot": 0,
-  "want": "Merseine",
-  "got": "Smite",
-  "ocr": "f           fi | Folens wt N    kL | Mite tw , | ' | So | IEA ee ain",
+  "file": "scenes/g3_000.jpg",
+  "slot": 5,
+  "want": "Guard Dogs",
+  "got": "Erase",
+  "ocr": "CT | ET Se | Pewdbugs - | ET Se | REE | Suid bes            a | p i       Le ms  CER ant | fT a",
   "det": true,
-  "ns": 0.27199999999999996
+  "ns": 0.33,
+  "sim": 0.6160978400216595
  },
  {
-  "file": "scenes/s012.jpg",
+  "file": "scenes/g3_002.jpg",
   "slot": 0,
-  "want": "Thallid Devourer",
-  "got": "Anger",
-  "ocr": "So | EN eR | OY ME | BENE | F AY  Nr PA Zot d | So | BN at | So",
+  "want": "Fasting",
+  "got": "Eaten Alive",
+  "ocr": "j  KN A l | FRE | gn | fF KT | Fee  xX - | FX | jEate aE | r  J TE  i Co  hid | IN         a  v | He NE i",
   "det": true,
-  "ns": 0.4
+  "ns": 0.36363636363636365,
+  "sim": 0.2967471844992282
  },
  {
-  "file": "scenes/s026.jpg",
-  "slot": 0,
-  "want": "Thorn Thallid",
-  "got": "Flare",
-  "ocr": "o-           Cw | A | z a | LL  re | mr                               L | Hae | w ssa    so | So | Fa I  B por EE | iis EAT UopRO Rut",
+  "file": "scenes/g3_002.jpg",
+  "slot": 7,
+  "want": "Koskun Keep",
+  "got": "The Meep",
+  "ocr": "To LIEW ANA P | Pag N   LEAP     To       sonatas | Te nee | A aay           -- | Keep | i     TA            or | Losstlaogy | eT RR",
   "det": true,
-  "ns": 0.4
+  "ns": 0.375,
+  "sim": 0.31519600036705003
  },
  {
-  "file": "scenes/s029.jpg",
-  "slot": 0,
-  "want": "Alchor's Tomb",
-  "got": "Arrest",
-  "ocr": "LE RY | ELLE | gr EE | AEREeT me | ETS ANP SS UT I | So | SIOLIAW S",
+  "file": "scenes/g3_003.jpg",
+  "slot": 2,
+  "want": "Living Death",
+  "got": "Reroute",
+  "ocr": "oso WM | re Rl | a WM EY | eo         Te | Ce    yo   n   oy    Tuten | By HP JO PI WINE OF ra   oo      re",
   "det": true,
-  "ns": 0.3933333333333333
+  "ns": 0.42857142857142855,
+  "sim": 0.16539712715467775
  },
  {
-  "file": "scenes/s035.jpg",
-  "slot": 0,
+  "file": "scenes/g3_003.jpg",
+  "slot": 3,
   "want": "Mana Drain",
-  "got": "Reset",
-  "ocr": "RET | FE | FE | sa reioe AU MWY | mses, WERNY N | er ye | Te | rE",
+  "got": "Temper",
+  "ocr": "y | ,                        - | BE EE | Te - ER B | AEE EEA | Be | em rem me smeow - | ce | PEEL Seven  aT  GETS | R | a",
   "det": true,
-  "ns": 0.4
+  "ns": 0.37333333333333335,
+  "sim": 0.10649904384406576
  },
  {
-  "file": "scenes/s036.jpg",
+  "file": "scenes/g3_005.jpg",
   "slot": 0,
-  "want": "Lich",
-  "got": "Needle Storm",
-  "ocr": "I A rn EN LTT LT emt a | fh              Co            ire | NEE aE ATR | BT ad | LE RIESE IRR ET ST | i | a  so    Tem ee een | L",
+  "want": "Divine Visitation",
+  "got": "Live Fast",
+  "ocr": "AE Sis figitestm | ile ITT DT el j | bss fdas | Lie faite I | Leaf isies ci | wIRRETTaens | So | oe ol meal",
   "det": true,
-  "ns": 0.4166666666666667
+  "ns": 0.2622222222222222,
+  "sim": 0.3300561572633577
  },
  {
-  "file": "scenes/s052.jpg",
-  "slot": 0,
-  "want": "Rally",
-  "got": "Ceti Eel",
-  "ocr": "TORE SEAT | ERR  oo | Jitallyn de ISTETE RAT | Rd, | ea, | NET EL | I  K O    s     s | Ie i | I    Gi So  y | ar   oe PRTT Toner,",
+  "file": "scenes/g3_005.jpg",
+  "slot": 1,
+  "want": "Peace Talks",
+  "got": "Refute",
+  "ocr": "ER EN | i m | Bc or Ta | T Pape Tally, | T Uae Billy     Se | rE Te | oF                       Cl | Ee ore",
   "det": true,
-  "ns": 0.375
+  "ns": 0.3333333333333333,
+  "sim": 0.3128684102620754
  },
  {
-  "file": "scenes/s066.jpg",
+  "file": "scenes/g3_006.jpg",
+  "slot": 3,
+  "want": "Delif's Cube",
+  "got": "Ent's Fury",
+  "ocr": "ents Guts      CL | EE Te | ar ea LI | Pent Cub n  CL | el BN ET  oT | i    Ree ated wv oa  ar rr",
+  "det": true,
+  "ns": 0.4,
+  "sim": 0.42143652690917077
+ },
+ {
+  "file": "scenes/g3_008.jpg",
   "slot": 0,
   "want": "Fasting",
   "got": "Hustle // Bustle",
-  "ocr": "I | Basch | Rd, | Buseloy en | a | Bustle rw W I - | THuscing PO      a | Janne Blinn vG Q | Sea | Em wna vGe",
+  "ocr": "Bhiscine TIE FUE | Bustling | LP TAE AE ATE | Whusclne OVE FUE | sora | ot umn velar  O | MA  ARO G",
   "det": true,
-  "ns": 0.13999999999999999
+  "ns": 0.15666666666666665,
+  "sim": 0.472031195402121
  },
  {
-  "file": "scenes/s075.jpg",
-  "slot": 0,
-  "want": "Thawing Glaciers",
-  "got": "Erase",
-  "ocr": "eeRE | HE | Ce | JERSE | I | A - | I     i | EET",
-  "det": true,
-  "ns": 0.13
- },
- {
-  "file": "scenes/s077.jpg",
-  "slot": 0,
-  "want": "Control Magic",
-  "got": "Camel",
-  "ocr": "HN | ro | we | OW | Came | aes | - | FRENTE",
-  "det": true,
-  "ns": 0.2
- },
- {
-  "file": "scenes/s089.jpg",
-  "slot": 0,
-  "want": "Flame Spirit",
-  "got": "Live Fast",
-  "ocr": "vine Fat NA               N | Ba | un Dhide SIE TEE | Aarne Spiric             , | PLB i Fe q | Cane Ramet | Ede LE ATT gait L | EZ                        uosdiue ff un",
-  "det": true,
-  "ns": 0.4
- },
- {
-  "file": "scenes/s090.jpg",
-  "slot": 0,
-  "want": "Divine Retribution",
-  "got": "Erase",
-  "ocr": "X vane Keer thst ion - | EBChdn  R | pr a  he | as PI te Masbudey  - | o hy i tx riby si,          - | pr a  he | ne Reet | Fees     , | -              ERE | rr",
-  "det": true,
-  "ns": 0.4
- },
- {
-  "file": "scenes/s103.jpg",
-  "slot": 0,
-  "want": "Celestial Gatekeeper",
+  "file": "scenes/g3_008.jpg",
+  "slot": 4,
+  "want": "Brine Hag",
   "got": "Far // Away",
-  "ocr": "Colvacia LCusRer ver T | I Celegelil Catckecpo BE | Colwositl Susrlesr por | - FoclsacglOatz te cer gs | F  Celegeieil Goieclice ger | AE Te | Far cea",
+  "ocr": "San bag, | - cD hii | Peis faagan    NZ | BE NGA NL | rin buy,  mae h | Peis faagan    NZ | Sam ag,   , | Pleiiz fils oR S   TYE | FAR is",
   "det": true,
-  "ns": 0.31
+  "ns": 0.27,
+  "sim": 0.15924359392115922
  },
  {
-  "file": "scenes/s109.jpg",
-  "slot": 0,
-  "want": "Martyr's Cause",
-  "got": "Famine",
-  "ocr": "BFP ENA | Pp FEN a   Ne oT | FANE | EAN, Sasa | SHAN NSFW | bE | FANE | So",
+  "file": "scenes/g3_010.jpg",
+  "slot": 3,
+  "want": "Animate Artifact",
+  "got": "Twitch",
+  "ocr": ", | --  Ae mm | iti cher vn, | Ce | TIME ROR TRV | iti cher vn, | Migs ho vm, WRN | ee eee | J   R     a | TTT es",
   "det": true,
-  "ns": 0.2633333333333333
+  "ns": 0.36333333333333334,
+  "sim": 0.29433875057297954
  },
  {
-  "file": "scenes/s111.jpg",
-  "slot": 0,
-  "want": "Soul Net",
-  "got": "Erase",
-  "ocr": "TW | -              BN A | a | PS     - | o | I | i | Be | or                -               - | ESSE",
+  "file": "scenes/g3_010.jpg",
+  "slot": 5,
+  "want": "Pyrostatic Pillar",
+  "got": "Eel Umbra",
+  "ocr": "L | Dyrevems We LT | Pyrmenn Phar    LL | Soe SEG oo | EE | So | TT TT TeX | EE evra",
   "det": true,
-  "ns": 0.4
+  "ns": 0.4444444444444444,
+  "sim": 0.3976860670528335
  },
  {
-  "file": "scenes/s119.jpg",
-  "slot": 0,
-  "want": "Lin Sivvi, Defiant Hero",
-  "got": "Divine Light",
-  "ocr": "JECT     l | IF Lhiiias Defhuie tigre | Lind Telus hue | Lin Disa, Debnenc bers     i | NESE | WS iz ior | pine  Ligh A | Lop memes | , | Form, om",
+  "file": "scenes/g3_010.jpg",
+  "slot": 8,
+  "want": "Welcome to . . . // Jurassic Park",
+  "got": "Island",
+  "ocr": "Misano | Na BEY | a | , a WA ity ra, -                 Ny | NA wider ta,,,             t | a | Nsaomew, J | Ee | So | a G   FS",
   "det": true,
-  "ns": 0.35333333333333333
+  "ns": 0.35333333333333333,
+  "sim": 0.4691388528475937
  },
  {
-  "file": "scenes/s123.jpg",
-  "slot": 0,
-  "want": "Off Balance",
-  "got": "Start // Fire",
-  "ocr": "PEGs Lad Te | l | STARE | pr | eee eee eee | wr AN pt",
-  "det": true,
-  "ns": 0.22400000000000003
- },
- {
-  "file": "scenes/s130.jpg",
-  "slot": 0,
+  "file": "scenes/g3_011.jpg",
+  "slot": 2,
   "want": "Ghitu Fire",
-  "got": "Lay Bare",
-  "ocr": "ASAE ETE EE      ol  i | Lo, y -  Bd    L | Lord or we | Er TN, | Lat Tar | A | seme lbe JET",
-  "det": true,
-  "ns": 0.375
- },
- {
-  "file": "scenes/s138.jpg",
-  "slot": 0,
-  "want": "Ward of Lights",
-  "got": "Agna Qel'a",
-  "ocr": "aon toed EEE | EE | d                                                        - | Tabu Cge | Le so | d                                                        - | A Vela | -  P | TE                                      wo | ,     DR EOE | Gs wo A mr",
-  "det": true,
-  "ns": 0.4444444444444444
- },
- {
-  "file": "scenes/s139.jpg",
-  "slot": 0,
-  "want": "Divine Visitation",
-  "got": "Peek",
-  "ocr": "PEE | lo | Uline Feieation | AL se fisteation oo | EEE | momremamwors | - | i eer WE",
-  "det": true,
-  "ns": 0.4
- },
- {
-  "file": "scenes/s146.jpg",
-  "slot": 0,
-  "want": "Ow",
-  "got": "Iron Star",
-  "ocr": "R- Ts   yo Se | P | ii ie oc Ei | Ym | PA  Fr OC | Bir ita | Ow        a | Ski RY CC | - af fpaedq J piewpq | iE TTA paeag oq prempa",
-  "det": true,
-  "ns": 0.4444444444444444
- },
- {
-  "file": "scenes/s149.jpg",
-  "slot": 0,
-  "want": "Universal Automaton",
-  "got": "Universal Solvent",
-  "ocr": "EER  Lr smaton | Eo e -      oy | R     cay t it smAton | Universal FROME | l              L | In            ovat a ater | Ge",
-  "det": true,
-  "ns": 0.35294117647058826
- },
- {
-  "file": "scenes/s163.jpg",
-  "slot": 0,
-  "want": "Rally the Peasants",
-  "got": "Rally the Forces",
-  "ocr": "I DL ale Dis | I matte alo ST EE | fl LL TAN BPS ROP PY | D   a Dascoas | p Rallv the RR es Fa | wo aun | I          PE  uof own",
-  "det": true,
-  "ns": 0.335
- },
- {
-  "file": "scenes/s339.jpg",
-  "slot": 0,
-  "want": "Invasion of Kylem // Valor's Reach Tag Team",
-  "got": "Dread Return",
-  "ocr": "BY Yam | a K    ' fz | BY Yr | B | DR RETA      nr     - | gai am             RATT",
-  "det": true,
-  "ns": 0.4266666666666667
- },
- {
-  "file": "scenes/s351.jpg",
-  "slot": 0,
-  "want": "Invasion of Belenon // Belenon War Anthem",
-  "got": "Fork",
-  "ocr": "BB EK am | for | A Ts | Gol BRR we | EER | Bl EK mas | WR Fam | D AX Fem | Nt J Ce | TTR XN    pintado bambi | TROT HP Jo SPIER CTTW we              sind      -",
-  "det": true,
-  "ns": 0.4
- },
- {
-  "file": "scenes/s356.jpg",
-  "slot": 0,
-  "want": "Invasion of Tarkir // Defiant Thundermaw",
-  "got": "Ready // Willing",
-  "ocr": "if FT | ef soa | REA | wh    - ra A To | ef soa | Oo AY rm | oe Hire | RETR Ul | IRO MP JO SPIFTM TOT OF wa     FN          RR Zi",
-  "det": true,
-  "ns": 0.4
- },
- {
-  "file": "scenes/s370.jpg",
-  "slot": 0,
-  "want": "Living Death",
-  "got": "No Way Out",
-  "ocr": "oo WA uv | eo WW SU | A  ra      edies, | ow ww | - WR a | eo WM uw | py | i A | i            ye",
-  "det": true,
-  "ns": 0.41200000000000003
- },
- {
-  "file": "scenes/s373.jpg",
-  "slot": 0,
-  "want": "Annie Flash, the Veteran",
-  "got": "Mer Man",
-  "ocr": "Pe lana | re hv EeE we | a mre | PASCO NLDA | a mre | VME lana | EV A mre | To",
-  "det": true,
-  "ns": 0.3028571428571429
- },
- {
-  "file": "scenes/s378.jpg",
-  "slot": 0,
-  "want": "Bloodletter of Aclazotz",
-  "got": "Realm-Cloaked Giant // Cast Off",
-  "ocr": "Cast Ort Caonsard | Gi-OfGomsores INO | Cast-Off Corsort OF | Nero toro Fa | Gii-Off Comores TOC | Cast OF onion | Cz  a oes Ne | - | Era st ara | ee yh oOWm    o     TY TIVE",
-  "det": true,
-  "ns": 0.145
- },
- {
-  "file": "scenes/s384.jpg",
-  "slot": 0,
-  "want": "Kona, Rescue Beastie",
-  "got": "Brass Man",
-  "ocr": "Beast Man, Savage  Henchman | Belisi Man, Savage Henchman | Beast Man, Savage Henchman | Beast Man, Savage Henchman | Till TPR, FubsceaTlandiien | Beast Man, Savage Hencl man | Beast Man, Savage Henchman | Beast Man, Savage Henchman | YA     Ed      SIRREL | Hy   PRE JT oO     oo       pr",
-  "det": true,
-  "ns": 0.0855555555555555
- },
- {
-  "file": "scenes/s385.jpg",
-  "slot": 0,
-  "want": "Liliana, Death's Majesty",
-  "got": "Gleemax",
-  "ocr": "- | os | Ba | GLEE a | Enea | Be | oo",
+  "got": "Clone",
+  "ocr": "EESY NE | I | econ | Ce | ERR | A | rr",
   "det": false,
-  "ns": 0.2857142857142857
+  "ns": 0.4,
+  "sim": 0.36698461431353435
  },
  {
-  "file": "scenes/s390.jpg",
-  "slot": 0,
-  "want": "Restricted Office // Lecture Hall",
-  "got": "Ride's End",
-  "ocr": "Rill Edn | EN RR TY | EEO Fens | Ea OR wm  - e See",
+  "file": "scenes/g3_011.jpg",
+  "slot": 3,
+  "want": "Icatian Javelineers",
+  "got": "Reset",
+  "ocr": "fi EN | rr | ere ET | Id    J | OE cin belies | Ptr | A | I        -   REI",
   "det": true,
-  "ns": 0.4577777777777778
+  "ns": 0.2,
+  "sim": 0.4394379859165315
+ },
+ {
+  "file": "scenes/g3_011.jpg",
+  "slot": 7,
+  "want": "Ifh-Bíff Efreet",
+  "got": "Castle",
+  "ocr": "Lo a | Le | fhlirer L | CALE - - | Pees SE | eadl ado | Placa oN | So | o nN       LAT Te gh",
+  "det": true,
+  "ns": 0.3333333333333333,
+  "sim": 0.39199773903163054
+ },
+ {
+  "file": "scenes/g3_012.jpg",
+  "slot": 4,
+  "want": "Lich",
+  "got": "Over the Top",
+  "ocr": "' | a TNE OS | Leh Te TO | Lich   ire SL WeHes | al Tl | A                 i | LAT LCE opie | BATS Shope of",
+  "det": true,
+  "ns": 0.4166666666666667,
+  "sim": 0.19530911595097375
+ },
+ {
+  "file": "scenes/g3_012.jpg",
+  "slot": 6,
+  "want": "Tidal Flats",
+  "got": "Ice Cage",
+  "ocr": "pi A ETRENNL RRR | Ch | Fic GETT | A Te TY TAN | FR, NN ANY | mrs EY | BT tm dal | age | NET",
+  "det": true,
+  "ns": 0.405,
+  "sim": 0.425574867807628
+ },
+ {
+  "file": "scenes/g3_013.jpg",
+  "slot": 0,
+  "want": "Psionic Entity",
+  "got": "Forest",
+  "ocr": "D | PRIA i TFN | Pe | pETOT SER RA | FOES NL Dh | PE | The, WT | B    I       -     JE pp | TTT Ty, gre",
+  "det": true,
+  "ns": 0.4533333333333333,
+  "sim": 0.6172791384687752
+ },
+ {
+  "file": "scenes/g3_013.jpg",
+  "slot": 3,
+  "want": "Animate Artifact",
+  "got": "Parhelion II",
+  "ocr": "EEE | F iN AW | I praeciin iis, GR | I Anidgredeofa ZY | Le TAA Pee NEN WA | I praeciin iis, GR | rr | rr | I Tam a ame min- | TE a",
+  "det": true,
+  "ns": 0.3866666666666667,
+  "sim": 0.30370584244139526
+ },
+ {
+  "file": "scenes/g3_014.jpg",
+  "slot": 3,
+  "want": "Riptide Mangler",
+  "got": "Languish",
+  "ocr": "PAL Ava    or    f | - Lk ii RIL | TE ool wh       AREY  y fl | vlangicy a   , j | SPDtea angles, Galli | TAY         PIES EY SDH | GAT ARR FEE",
+  "det": true,
+  "ns": 0.46499999999999997,
+  "sim": 0.43382113705290093
+ },
+ {
+  "file": "scenes/g3_016.jpg",
+  "slot": 3,
+  "want": "Secret Plans",
+  "got": "Sea's Claim",
+  "ocr": "Dt PARR | OC | Secreniis | Beever Putt           oo | Se lim | Bibiana | el - | cr P | rr | - Tw",
+  "det": true,
+  "ns": 0.4,
+  "sim": 0.30948471224575674
+ },
+ {
+  "file": "scenes/g3_017.jpg",
+  "slot": 1,
+  "want": "Search for Dagger",
+  "got": "Emcee",
+  "ocr": "EE | J | oo | Em EE | JE | loco coh ENE | LITE Y      fo         - Z",
+  "det": false,
+  "ns": 0.2,
+  "sim": 0.24710237314244304
+ },
+ {
+  "file": "scenes/g3_018.jpg",
+  "slot": 0,
+  "want": "Tivadar's Crusade",
+  "got": "Reset",
+  "ocr": "EE | PT | TT SR | EE | A Sr | REET | TE | TT",
+  "det": true,
+  "ns": 0.2,
+  "sim": 0.35540649370171346
+ },
+ {
+  "file": "scenes/g3_018.jpg",
+  "slot": 1,
+  "want": "Lich",
+  "got": "Clone",
+  "ocr": "rr | SSE UAR | EE | EL FL | ARE RnR ET A | ONE | rr | ge | - | EET St hea",
+  "det": true,
+  "ns": 0.4,
+  "sim": 0.19959960299402324
+ },
+ {
+  "file": "scenes/g3_018.jpg",
+  "slot": 7,
+  "want": "Dwarven Hold",
+  "got": "Flash",
+  "ocr": "i SP re, - | RE | i  j                                        - | Faas | fi ER, A | A | PP",
+  "det": false,
+  "ns": 0.4,
+  "sim": 0.5126395386441663
+ },
+ {
+  "file": "scenes/g3_018.jpg",
+  "slot": 8,
+  "want": "Bulk Up",
+  "got": "Remand",
+  "ocr": "- -   -     -    - | CEE | rer nd                 - | RPT | Br | - -    -       m     - | Fe iw | EE t | eee,",
+  "det": true,
+  "ns": 0.3333333333333333,
+  "sim": 0.2466728897456952
+ },
+ {
+  "file": "scenes/g3_019.jpg",
+  "slot": 6,
+  "want": "Wall of Hope",
+  "got": "Fire // Ice",
+  "ocr": "eo   oo | J | AYA ope ici | RERVST or Pr SR | RY UV SHE YD Se | J | L | TAS RT | Fira | ne",
+  "det": true,
+  "ns": 0.43000000000000005,
+  "sim": 0.5801966506755376
+ },
+ {
+  "file": "scenes/g3_019.jpg",
+  "slot": 7,
+  "want": "Mana Drain",
+  "got": "Enlarge",
+  "ocr": "Core ge    woe | Hits  AWRY | JT A WA | Mane Draelo    NY - | Hits  AWRY | EE    LORIE | re | '    FY    nn   - | Co    ral fi igie",
+  "det": true,
+  "ns": 0.42857142857142855,
+  "sim": 0.7112786278188941
+ },
+ {
+  "file": "scenes/g3_020.jpg",
+  "slot": 1,
+  "want": "Restricted Office // Lecture Hall",
+  "got": "Reject",
+  "ocr": "J NE Rell | re                           ESTE | IRR A NEI FLEN N | PAE AT RT | pS           Co | - p  o -",
+  "det": true,
+  "ns": 0.35333333333333333,
+  "sim": 0.21075679530936328
+ },
+ {
+  "file": "scenes/g3_020.jpg",
+  "slot": 6,
+  "want": "Snowfall",
+  "got": "Marut",
+  "ocr": "age Ho    -   AAA  SA BY | CoN aC aN ar | Foes all Ve AL Twa iY wis | A EN Ti | FREES WR | Mat | Fs  TAL EA      YY | XY B | So",
+  "det": true,
+  "ns": 0.4,
+  "sim": 0.24407857801140515
+ },
+ {
+  "file": "scenes/g3_021.jpg",
+  "slot": 3,
+  "want": "Ifh-Bíff Efreet",
+  "got": "Mise",
+  "ocr": "ARTES ci | MhlufShreer  d | Mise CR | Cc | py | ici   SER | So | pe   -",
+  "det": true,
+  "ns": 0.24,
+  "sim": 0.18921162768062746
+ },
+ {
+  "file": "scenes/g3_022.jpg",
+  "slot": 0,
+  "want": "High Tide",
+  "got": "Reset",
+  "ocr": "So | JEST | Err Te | Ts Sr ey | So | Le | b | uf         -",
+  "det": true,
+  "ns": 0.4,
+  "sim": 0.43102322611834204
+ },
+ {
+  "file": "scenes/g3_022.jpg",
+  "slot": 4,
+  "want": "Rally",
+  "got": "See Red",
+  "ocr": "ENE | ee rere | PL olf Apr ay pr | e em   R | I rR ETS | POE | TT ey | w-  -",
+  "det": true,
+  "ns": 0.32,
+  "sim": 0.5056216784533082
+ },
+ {
+  "file": "scenes/g3_023.jpg",
+  "slot": 2,
+  "want": "Annie Flash, the Veteran",
+  "got": "Turn to Dust",
+  "ocr": "pd ls WALD od | TU EE Ta     d ST deve | TAT TY Ie | AYN | SNE Nag TTT | TAT MYT | Sy Uf GRE IEEE Ye,    ,   aia wren a | LL            BE | Pom PP a alg",
+  "det": true,
+  "ns": 0.4666666666666666,
+  "sim": 0.29613130027194157
+ },
+ {
+  "file": "scenes/g3_024.jpg",
+  "slot": 1,
+  "want": "Off Balance",
+  "got": "Lone Wolf",
+  "ocr": "So | Foi a    v | PLBnE oF LL | Bde CC | fo | F  I ki o | So",
+  "det": true,
+  "ns": 0.3733333333333333,
+  "sim": 0.35108319093223506
+ },
+ {
+  "file": "scenes/g3_024.jpg",
+  "slot": 6,
+  "want": "Lich",
+  "got": "Relic Barrier",
+  "ocr": "Jr | ARE UN  CARRER | QBs TT a AER | Luh    EN RE RY TH | Vr   PERCE AT | QBs TT a AER | J | EE TY | J | a",
+  "det": true,
+  "ns": 0.38461538461538464,
+  "sim": 0.01383817135586314
+ },
+ {
+  "file": "scenes/g3_025.jpg",
+  "slot": 1,
+  "want": "Perplex",
+  "got": "Erase",
+  "ocr": "i T | er | f       y | ease nm | a | Ce T | ee sam | oo    rag - | Rede",
+  "det": true,
+  "ns": 0.27199999999999996,
+  "sim": 0.45693180547339163
+ },
+ {
+  "file": "scenes/g3_025.jpg",
+  "slot": 2,
+  "want": "Martyr's Cause",
+  "got": "Romana II",
+  "ocr": "kegs A BV WN | So | EL Nias ToL | Bacciata sits | Reta a iV PE | ban a sn a oo ann | So | Fm oP",
+  "det": true,
+  "ns": 0.4977777777777778,
+  "sim": 0.3068085665389168
+ },
+ {
+  "file": "scenes/g3_025.jpg",
+  "slot": 4,
+  "want": "Tithing Blade // Consuming Sepulcher",
+  "got": "Mer Man",
+  "ocr": "a | a XII | PE ian | EY Yi twe Rta | AT | PE ian | a | ee | A | LE as XJ",
+  "det": true,
+  "ns": 0.35857142857142854,
+  "sim": 0.5496597583479831
+ },
+ {
+  "file": "scenes/g3_025.jpg",
+  "slot": 6,
+  "want": "Mana Drain",
+  "got": "Johan",
+  "ocr": "Ish WAN | eos WRN A | BY LACIE W | I Ae pat NN - WYYV | Bi tan S WE | J WAN | som wm | MA FF IAL | - | PPT cvusv rats",
+  "det": true,
+  "ns": 0.4,
+  "sim": 0.40630092777076254
+ },
+ {
+  "file": "scenes/g3_028.jpg",
+  "slot": 3,
+  "want": "Ow",
+  "got": "Port Town",
+  "ocr": "we | rio NY Be DART | Ow | Te   LL  Co | No Tow     A | as   EEres | i | CY ed ever | A EE",
+  "det": true,
+  "ns": 0.47111111111111115,
+  "sim": 0.3828879088284304
+ },
+ {
+  "file": "scenes/g3_028.jpg",
+  "slot": 6,
+  "want": "Fasting",
+  "got": "Hop to It",
+  "ocr": "Busch aru ER | a oe oo AT dd | Bs rT T | FE A | fcc | CT T | Peeper    Lo | EE il",
+  "det": true,
+  "ns": 0.48444444444444446,
+  "sim": 0.33914272868777257
+ },
+ {
+  "file": "scenes/g3_028.jpg",
+  "slot": 7,
+  "want": "Thallid Devourer",
+  "got": "Cosima, God of the Voyage // The Omenkeel",
+  "ocr": "So | RE tL | FC DWV A | CN MEN EEL | CN A aA | So | D | i wat ATT - Sat zX",
+  "det": true,
+  "ns": 0.4166666666666667,
+  "sim": 0.21242779699862213
+ },
+ {
+  "file": "scenes/g3_029.jpg",
+  "slot": 2,
+  "want": "Restricted Office // Lecture Hall",
+  "got": "Wax // Wane",
+  "ocr": "So | rw ANE | Toren Vetere | So | So | Logit Le J A ol TTL SRY FV              a     eA | SmOmp eA OV am       ag",
+  "det": true,
+  "ns": 0.4,
+  "sim": 0.04627850683249795
+ },
+ {
+  "file": "scenes/g3_029.jpg",
+  "slot": 7,
+  "want": "High Tide",
+  "got": "Grave Titan",
+  "ocr": "So | Te TON TT | TRAE TION TRY | ims Y  RNS | So | So | TT TAR iba vag Aims",
+  "det": true,
+  "ns": 0.4072727272727273,
+  "sim": 0.313151214438922
  }
 ]

@@ -6,7 +6,7 @@ const br = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', he
   args: ['--no-sandbox', '--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream', '--use-file-for-fake-video-capture=' + y4m] });
 const pg = await br.newPage(); await pg.setViewport({ width: 412, height: 915, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
 const errs = []; pg.on('pageerror', e => errs.push(e.message)); pg.on('console', m => m.type() === 'error' && errs.push(m.text()));
-await pg.goto('http://localhost:8766/'); 
+await pg.goto(process.env.BASE || 'http://localhost:8766/'); 
 await pg.waitForFunction(() => document.querySelector('#scan-status').textContent === 'Ready', { timeout: 120000 });
 await pg.click('#btn-startcam'); await pg.waitForFunction(() => document.querySelector('#video').videoWidth > 0);
 await new Promise(r => setTimeout(r, 1500));
