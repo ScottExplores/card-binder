@@ -65,7 +65,7 @@ export class Identifier {
     if (this.featCache.has(card.id)) return this.featCache.get(card.id);
     const p = (async () => {
       const k = 'ft:' + card.id; const c = await kvGet(k); if (c) return { full: new Float32Array(c.full), art: new Float32Array(c.art) };
-      const url = imgUrl(card, 'small'); if (!url) return null;
+      if (card.noimg) return null; const url = imgUrl(card, 'small'); if (!url) return null;
       const im = await loadImg(url).catch(() => null); if (!im) return null;
       const f = this.feat(im); kvSet(k, { full: Array.from(f.full), art: Array.from(f.art) }); return f;
     })();
@@ -147,11 +147,12 @@ export class Identifier {
       if (!f) return { match: null, ocr: rd.text, ms: performance.now() - t0 };
       cands = [{ full: f.name, score: 0.35, eff: 0.35 }];
     }
-    let bestAll = null;
+    let bestAll = null; const allComb = [];
     for (const nc of cands.slice(0, 10)) {
       const prints = db().byName.get(nc.full) || []; if (!prints.length) continue;
       let scored = (await Promise.all((nc.art ? prints.slice(0, 40) : prints.slice(0, 120)).map(async p => { const f = await this.printFeat(p); const v = f ? this.sim(cf, f) : -1; return { p, s: Number.isFinite(v) ? v : -1 }; }))).sort((a, b) => b.s - a.s);
-      const combined = scored[0].s - nc.eff * 1.2;
+      const combined = scored[0].s - nc.eff * 1.2 - (nc.art && scored[0].p.fullart && nc.eff > 0.3 ? 0.12 : 0); // borderless art is generic-looking
+      allComb.push(combined);
       if (!bestAll || combined > bestAll.combined) bestAll = { nc, scored, combined };
       if (nc.eff < 0.05 && scored[0].s > 0.6) break; // confident text + matching art: done
     }
@@ -161,7 +162,8 @@ export class Identifier {
     // ambiguous printings (same art reprints): lean to old frame, then oldest
     const near = scored.filter(x => x.s >= top - 0.03);
     const pick = near.find(x => isOldFrame(x.p)) || near[0];
-    const conf = nc.art ? (pick.s >= 0.8 ? 'high' : pick.s >= 0.65 ? 'medium' : 'low') : bestAll.scored[0].s < 0.35 && nc.eff > 0.15 ? 'low' : nc.eff < 0.15 && (scored.length === 1 || near.length === 1 || top - (scored.find(x => !near.includes(x))?.s ?? 0) > 0.05) ? 'high' : nc.score < 0.3 ? 'medium' : 'low';
+    const margin = bestAll.combined - (allComb.sort((a, b) => b - a)[1] ?? -1);
+    const conf = nc.art ? (pick.s >= 0.85 && margin > 0.08 ? 'high' : pick.s >= 0.7 && margin > 0.03 ? 'medium' : 'low') : bestAll.scored[0].s < 0.35 && nc.eff > 0.15 ? 'low' : nc.eff < 0.15 && (scored.length === 1 || near.length === 1 || top - (scored.find(x => !near.includes(x))?.s ?? 0) > 0.05) ? 'high' : nc.score < 0.3 ? 'medium' : 'low';
     return { match: pick.p, viaArt: !!nc.art, combined: bestAll.combined, alts: scored.slice(0, 40).map(x => x.p), printAmbiguous: near.length > 1, nameScore: nc.eff, imgSim: pick.s, conf, ocr: rd.text, ms: performance.now() - t0 };
   }
 }

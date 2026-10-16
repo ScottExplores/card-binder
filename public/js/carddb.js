@@ -7,7 +7,7 @@ export async function loadDB(url = './data/cards.json') {
   const C = j.cols.reduce((o, k, i) => (o[k] = i, o), {});
   const prints = j.rows.map(r => {
     const p = { id: r[C.id], name: j.names[r[C.name]], set: r[C.set], set_name: j.sets[r[C.set]], cn: r[C.cn], frame: r[C.frame], rarity: r[C.rarity], fin: r[C.fin],
-      usd: r[C.usd], usd_foil: r[C.usd_foil], usd_etched: r[C.usd_etched], released: r[C.released], fullart: !!r[C.fullart] };
+      usd: r[C.usd], usd_foil: r[C.usd_foil], usd_etched: r[C.usd_etched], released: r[C.released], fullart: !!r[C.fullart], noimg: !!r[C.noimg] };
     byId.set(p.id, p); bySetCn.set(p.set + '/' + p.cn, p);
     if (!byName.has(p.name)) byName.set(p.name, []); byName.get(p.name).push(p); return p;
   });
