@@ -99,7 +99,8 @@ button,select,input{font:inherit;color:inherit}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap}
 .btn-row .btn{flex:1}
 .field{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:16px}
-.toast{position:fixed;left:12px;right:12px;bottom:calc(var(--tab) + 120px + env(safe-area-inset-bottom));z-index:60;background:#f2f3f5;color:#111;border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;box-shadow:0 8px 30px #0008}
+.toast{position:fixed;left:12px;right:12px;top:calc(118px + env(safe-area-inset-top));z-index:60;background:#f2f3f5;color:#111;border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;box-shadow:0 8px 30px #0008}
 .toast button{border:0;background:#111;color:#fff;border-radius:10px;padding:10px 14px;font-weight:700}
 .sugg{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .sugg button{text-align:left}
+[hidden]{display:none!important}

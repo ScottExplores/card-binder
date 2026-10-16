@@ -233,7 +233,7 @@ function row(e) {
 }
 function renderBinder() {
   const l = filtered(); const t = binder.totals(l);
-  $('#binder-sum').textContent = `${t.count} cards (${t.unique} unique) · ${money(t.value)}`;
+  $('#binder-sum').textContent = `${t.count} card${t.count === 1 ? '' : 's'} (${t.unique} unique) · ${money(t.value)}`;
   $('#list').hidden = S.view !== 'list'; $('#pages').hidden = S.view !== 'pages';
   if (!binder.entries().length) { $('#list').innerHTML = '<div class="empty">Your binder is empty.<br>Go to <b>Scan</b> and point the camera at a card.</div>'; $('#list').hidden = false; $('#pages').hidden = true; return; }
   if (S.view === 'list') {
@@ -308,7 +308,7 @@ $('#imp').onchange = async e => {
   const { items, missing } = importManaBox(await f.text(), db()); e.target.value = '';
   if (!items.length) return toast('No cards recognised in that file');
   await binder.add(items, `Import (${items.length})`);
-  toast(`Imported ${items.reduce((a, i) => a + i.qty, 0)} cards` + (missing.length ? ` · ${missing.length} rows not matched` : ''), undoLast); renderValue();
+  toast(`Imported ${items.reduce((a, i) => a + i.qty, 0)} cards` + (missing.length ? ` · ${missing.length} row${missing.length === 1 ? '' : 's'} not matched` : ''), undoLast); renderValue();
 };
 $('#btn-sync').onclick = () => openSheet(`<h2>Backup</h2><p class="sub">Your binder is saved on this phone. Save a backup file to Google Drive or Files, and restore it on any device.</p>
   <div class="btn-row"><button class="btn big" id="bk">Save backup</button><label class="btn big">Restore<input type="file" id="rs" accept=".json,application/json" hidden></label></div>`, root => {
