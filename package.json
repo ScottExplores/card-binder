@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test/unit.mjs && node test/e2e.mjs",
+    "bench": "node bench/run.mjs single 400 && node bench/run.mjs /g 70",
+    "build:db": "cd build && python3 build_db.py",
+    "deploy": "bash deploy.sh"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +18,7 @@
     "sharp": "^0.35.5",
     "tesseract.js": "^5.1.1",
     "tesseract.js-core": "^5.1.1"
-  }
+  },
+  "type": "module",
+  "private": true
 }

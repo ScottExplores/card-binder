@@ -4,3 +4,4 @@ build/ua.jsonl.gz
 build/art/
 bench/cards/
 bench/scenes/
+dist/

@@ -1,16 +1,5 @@
 [
  {
-  "file": "scenes/g2_010.jpg",
-  "slot": 3,
-  "want": "High Tide",
-  "got": "Deserted Temple",
-  "ocr": "f' Iels Tid | TT s | Vere e | EE | ME awe | ET",
-  "det": true,
-  "ns": 0.42,
-  "sim": 0.8465638404555529,
-  "art": true
- },
- {
   "file": "scenes/g2_014.jpg",
   "slot": 3,
   "want": "Snowfall",
@@ -44,17 +33,6 @@
   "art": true
  },
  {
-  "file": "scenes/g2_028.jpg",
-  "slot": 1,
-  "want": "Visions of Beyond",
-  "got": "Plains",
-  "ocr": "I | fA j        i | A EE | pa | fee ER Ce ti rte | PE | i anit",
-  "det": true,
-  "ns": 0.42,
-  "sim": 0.8216566423456411,
-  "art": true
- },
- {
   "file": "scenes/g3_000.jpg",
   "slot": 0,
   "want": "Vampire Bats",
@@ -74,6 +52,17 @@
   "det": true,
   "ns": 0.42,
   "sim": 0.699887250489801,
+  "art": true
+ },
+ {
+  "file": "scenes/g3_010.jpg",
+  "slot": 8,
+  "want": "Welcome to . . . // Jurassic Park",
+  "got": "The Aesir Escape Valhalla",
+  "ocr": "Niemen J | OO eli ome Tn          l | Bvomew J | S vrscomd TA         b | OO wikcunme to,,, | Miegvemen, J | ee | palsy y | wr GEG rw   FS",
+  "det": true,
+  "ns": 0.42,
+  "sim": 0.9110602101693592,
   "art": true
  },
  {
@@ -102,22 +91,11 @@
   "file": "scenes/g3_017.jpg",
   "slot": 1,
   "want": "Search for Dagger",
-  "got": "Castle Ardenvale",
-  "ocr": "EE | J | oo | Em EE | JE | loco coh ENE | LITE Y      fo         - Z",
+  "got": "Doom's Time Platform",
+  "ocr": "J | I | FE a | SC | - | Le | PE | Er a TT EI | J sn | CR am | a, mead",
   "det": false,
   "ns": 0.42,
-  "sim": 0.5577876336968651,
-  "art": true
- },
- {
-  "file": "scenes/g3_018.jpg",
-  "slot": 0,
-  "want": "Tivadar's Crusade",
-  "got": "Deserted Temple",
-  "ocr": "EE | PT | TT SR | EE | A Sr | REET | TE | TT",
-  "det": true,
-  "ns": 0.42,
-  "sim": 0.8193709941453083,
+  "sim": 0.523544311597821,
   "art": true
  },
  {
@@ -129,17 +107,6 @@
   "det": false,
   "ns": 0.42,
   "sim": 0.6589505033569756,
-  "art": true
- },
- {
-  "file": "scenes/g3_025.jpg",
-  "slot": 2,
-  "want": "Martyr's Cause",
-  "got": "Deserted Temple",
-  "ocr": "VAG Sa | rr | Erg ae | AA APS CT | i ry LE | BEL TOT ae | INIA Sa | ow awe i | I   m | EE EE Tum",
-  "det": true,
-  "ns": 0.42,
-  "sim": 0.8325617858229952,
   "art": true
  },
  {
