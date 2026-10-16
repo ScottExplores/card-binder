@@ -17,7 +17,7 @@ window.runBench = async (items) => {
     const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0);
     try {
       const r = await idf.identifyCanvas(c, { mode: it.mode });
-      out.push({ file: it.file, nan: window.__nan|0, ms: r.ms, tDetect: r.tDetect, res: r.results.map(x => ({ slot: x.slot, detected: x.detected, id: x.match?.id, name: x.match?.name, oid: x.match?.oracle_id, ocr: x.ocr, conf: x.conf, ns: x.nameScore, sim: x.imgSim, alts: (x.alts || []).slice(0, 5).map(a => a.id), ms: x.ms })) });
+      out.push({ file: it.file, nan: window.__nan|0, ms: r.ms, tDetect: r.tDetect, res: r.results.map(x => ({ slot: x.slot, detected: x.detected, id: x.match?.id, name: x.match?.name, oid: x.match?.oracle_id, ocr: x.ocr, conf: x.conf, ns: x.nameScore, sim: x.imgSim, art: x.viaArt, alts: (x.alts || []).slice(0, 5).map(a => a.id), ms: x.ms })) });
     } catch (e) { out.push({ file: it.file, err: String(e) }); }
   }
   return out;

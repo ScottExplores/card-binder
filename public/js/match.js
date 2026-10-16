@@ -29,6 +29,11 @@ export class NameIndex {
     let best = 1e9, bj = 0; for (let j = 0; j <= m; j++) { const v = prev[j]; if (v < best) { best = v; bj = j; } }
     return { d: best, end: bj };
   }
+  scoreName(full, raw) { // best face score of a known name against OCR text
+    const text = norm(raw); if (text.length < 3) return 1; let best = 1;
+    for (const f of full.split(' // ')) { const key = norm(f); const { d, end } = this.dist(key, text); const sc = (d + 0.12 * (text.length - end)) / key.length + (key.length < 5 ? 0.15 : 0); if (sc < best) best = sc; }
+    return best;
+  }
   search(raw, k = 5) {
     const text = norm(raw); if (text.length < 3) return [];
     const m = text.length, res = [];

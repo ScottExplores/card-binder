@@ -20,7 +20,7 @@ for (const r of res) {
     const g = r.res?.find(x => (t.mode === 'single' ? true : x.slot === slot)); const truthC = cards[id];
     const n = g && g.name === truthC.name ? 1 : 0, p = g && g.id === id ? 1 : 0; tot++; nameOk += n; printOk += p; if (g?.alts?.includes(id)) top5++;
     add(t.mode, n, p); add(t.mode + ':' + t.cond, n, p); add('group:' + truthC.group, n, p);
-    if (!n) fails.push({ file: t.file, slot, want: truthC.name, got: g?.name, ocr: g?.ocr, det: g?.detected, ns: g?.ns, sim: g?.sim });
+    if (!n) fails.push({ file: t.file, slot, want: truthC.name, got: g?.name, ocr: g?.ocr, det: g?.detected, ns: g?.ns, sim: g?.sim, art: g?.art });
   });
 }
 const pct = x => (100 * x).toFixed(1) + '%';
