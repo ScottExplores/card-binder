@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111318">
+<title>Card Binder</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+  <!-- SCAN -->
+  <section id="v-scan" class="view active">
+    <div class="cam">
+      <video id="video" playsinline muted autoplay></video>
+      <canvas id="overlay"></canvas>
+      <div id="cam-msg" class="cam-msg">Tap <b>Start camera</b></div>
+      <button id="btn-startcam" class="btn big primary center-btn">Start camera</button>
+    </div>
+    <div class="scan-top">
+      <div class="seg" id="mode-seg" role="tablist">
+        <button data-mode="single" class="on">1 card</button>
+        <button data-mode="grid2">4 (2×2)</button>
+        <button data-mode="grid3">9 (3×3)</button>
+      </div>
+      <div class="scan-toggles">
+        <button id="tg-auto" class="chip" aria-pressed="false" title="Scan automatically when a card is steady">Auto</button>
+        <button id="tg-foil" class="chip" aria-pressed="false">Foil</button>
+        <button id="tg-torch" class="chip" aria-pressed="false" hidden>Light</button>
+      </div>
+    </div>
+    <div class="scan-bottom">
+      <div id="tray" class="tray"></div>
+      <div class="shutter-row">
+        <label class="btn ghost small" title="Scan a photo from your gallery">Photo<input id="file-in" type="file" accept="image/*" hidden></label>
+        <button id="btn-shutter" class="shutter" aria-label="Scan"><span></span></button>
+        <div id="scan-status" class="scan-status">Loading…</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BINDER -->
+  <section id="v-binder" class="view">
+    <header class="bar">
+      <input id="q" type="search" placeholder="Search your binder" autocomplete="off">
+      <div class="row">
+        <button id="f-over5" class="chip" aria-pressed="false">Over $5</button>
+        <select id="sort">
+          <option value="value">Value</option><option value="name">Name</option><option value="set">Set</option><option value="added">Newest</option>
+        </select>
+        <div class="seg small" id="view-seg"><button data-v="list" class="on">List</button><button data-v="pages">Pages</button></div>
+      </div>
+    </header>
+    <div id="binder-sum" class="sum"></div>
+    <div id="list" class="list"></div>
+    <div id="pages" class="pages" hidden>
+      <div id="page-grid" class="page-grid"></div>
+      <div class="pager"><button id="pg-prev" class="btn ghost">‹ Prev</button><span id="pg-num"></span><button id="pg-next" class="btn ghost">Next ›</button></div>
+    </div>
+  </section>
+
+  <!-- VALUE -->
+  <section id="v-value" class="view">
+    <div class="value-hero">
+      <div class="label">Collection value</div>
+      <div id="total" class="total">$0.00</div>
+      <div id="total-sub" class="sub"></div>
+      <div id="prices-age" class="sub small"></div>
+    </div>
+    <div class="value-actions">
+      <button id="btn-refresh" class="btn big">Refresh prices</button>
+      <button id="btn-csv" class="btn big">Export CSV</button>
+      <button id="btn-mox" class="btn big">Export for Moxfield</button>
+      <label class="btn big">Import ManaBox CSV<input id="imp" type="file" accept=".csv,text/csv" hidden></label>
+      <button id="btn-sync" class="btn big ghost">Cloud backup</button>
+    </div>
+    <h3 class="h">Most valuable</h3>
+    <div id="top" class="list"></div>
+  </section>
+
+  <nav class="tabs">
+    <button data-tab="scan" class="on"><span class="ic">◉</span>Scan</button>
+    <button data-tab="binder"><span class="ic">▦</span>Binder</button>
+    <button data-tab="value"><span class="ic">$</span>Value</button>
+  </nav>
+</div>
+
+<div id="sheet" class="sheet" hidden><div class="sheet-bg"></div><div class="sheet-body" id="sheet-body"></div></div>
+<div id="toast" class="toast" hidden></div>
+<script src="vendor/tess/tesseract.min.js" defer></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

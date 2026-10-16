@@ -1,0 +1,39 @@
+<!doctype html><meta charset=utf-8><body><pre id=log></pre>
+<script src="/public/vendor/tess/tesseract.min.js"></script>
+<script type=module>
+import { loadCV } from '/public/js/loadcv.js';
+import { NameIndex } from '/public/js/match.js';
+import { Identifier } from '/public/js/identify.js';
+import { loadDB } from '/public/js/carddb.js';
+const log = t => (document.getElementById('log').textContent += t + '\n');
+window.runBench = async (items) => {
+  console.log('loading cv');const cv = await loadCV('/public/vendor/opencv.js');
+  const names = (await loadDB('/public/data/cards.json')).names;
+  if (!window.idf) { window.idf = new Identifier({ cv, Tesseract, names, NameIndex, workers: 4, base: '/public/vendor/' }); console.log('init tess');await idf.init(()=>console.log('worker up')); }
+  console.log('ready to run');
+  const out = [];
+  for (const it of items) {
+    const img = new Image(); img.src = '/bench/' + it.file; await img.decode();
+    const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight; c.getContext('2d').drawImage(img, 0, 0);
+    try {
+      const r = await idf.identifyCanvas(c, { mode: it.mode });
+      out.push({ file: it.file, nan: window.__nan|0, ms: r.ms, tDetect: r.tDetect, res: r.results.map(x => ({ slot: x.slot, detected: x.detected, id: x.match?.id, name: x.match?.name, oid: x.match?.oracle_id, ocr: x.ocr, conf: x.conf, ns: x.nameScore, sim: x.imgSim, alts: (x.alts || []).slice(0, 5).map(a => a.id), ms: x.ms })) });
+    } catch (e) { out.push({ file: it.file, err: String(e) }); }
+  }
+  return out;
+};
+log('ready');
+</script>
+<script type=module>
+window.variantBench = async (cards, variants) => {
+  const B = { x0: 0.055, x1: 0.80, y0: 0.035, y1: 0.098 }; const out = [];
+  for (const c of cards) {
+    const img = new Image(); img.src = '/bench/cards/' + c.id + '.jpg'; await img.decode();
+    const cc = document.createElement('canvas'); cc.width = 488; cc.height = 680; cc.getContext('2d').drawImage(img, 0, 0, 488, 680);
+    const r = { group: c.group };
+    await Promise.all(variants.map(async v => { const o = await idf.ocr(idf.bandCanvas(cc, B, v)); const top = idf.index.search(o.text, 1)[0]; r[v] = top && top.full === c.name ? 1 : 0; }));
+    out.push(r);
+  }
+  return out;
+};
+</script>

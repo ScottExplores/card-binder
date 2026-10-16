@@ -1,0 +1,6 @@
+node_modules/
+build/default.jsonl.gz
+build/ua.jsonl.gz
+build/art/
+bench/cards/
+bench/scenes/
