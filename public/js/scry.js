@@ -1,7 +1,7 @@
 // Scryfall API client with polite rate limiting and in-memory + IndexedDB caching.
 import { kvGet, kvSet } from './db.js';
 const API = 'https://api.scryfall.com';
-let last = 0; const GAP = 80;
+let last = 0; const GAP = 520; // Scryfall asks <=2 req/s for search, named and collection
 const mem = new Map();
 async function throttle() { const now = Date.now(); const wait = Math.max(0, last + GAP - now); last = now + wait; if (wait) await new Promise(r => setTimeout(r, wait)); }
 export async function sget(path, { cacheHours = 24 } = {}) {
