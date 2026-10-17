@@ -14,13 +14,16 @@ t('csv parse quotes/newlines/BOM', () => { const r = parseCSV('\uFEFFa,b\r\n"x, 
 t('manabox import by scryfall id, set/cn, name; foil; qty; missing', () => {
   const sol = db.byName.get('Sol Ring').find(p => p.set === 'c21');
   const csv = `Name,Set code,Set name,Collector number,Foil,Rarity,Quantity,ManaBox ID,Scryfall ID,Purchase price,Misprint,Altered,Condition,Language,Purchase price currency
-Sol Ring,C21,Commander 2021,263,foil,uncommon,3,1,${sol.id},0,false,false,near_mint,en,USD
+Sol Ring,C21,Commander 2021,263,normal,uncommon,3,1,${sol.id},0,false,false,near_mint,en,USD
 Necropotence,ICE,Ice Age,154,normal,rare,1,2,,0,false,false,near_mint,en,USD
 "Delver of Secrets",ISD,Innistrad,51,normal,common,2,3,,0,false,false,near_mint,en,USD
-Bogus Card,XXX,,1,normal,common,1,4,,0,false,false,near_mint,en,USD`;
+Bogus Card,XXX,,1,normal,common,1,4,,0,false,false,near_mint,en,USD
+Sol Ring,C21,Commander 2021,263,foil,uncommon,1,5,${sol.id},0,false,false,near_mint,en,USD
+Sol Ring,XYZ,Nowhere,999,normal,uncommon,1,6,,0,false,false,near_mint,en,USD
+Sol Ring,C21,Commander 2021,263,normal,uncommon,2.5,7,,0,false,false,near_mint,en,USD`;
   const { items, missing } = importManaBox(csv, db);
-  assert.equal(items.length, 3); assert.equal(missing.length, 1);
-  assert.equal(items[0].print.id, sol.id); assert.equal(items[0].finish, 'foil'); assert.equal(items[0].qty, 3);
+  assert.equal(items.length, 3); assert.equal(missing.length, 4, 'bogus, foil-less foil, wrong set/cn, fractional qty are rejected');
+  assert.equal(items[0].print.id, sol.id); assert.equal(items[0].finish, 'nonfoil'); assert.equal(items[0].qty, 3);
   assert.equal(items[1].print.set, 'ice'); assert.equal(items[2].print.name, 'Delver of Secrets // Insectile Aberration');
 });
 t('exports round-trip through parser', () => {

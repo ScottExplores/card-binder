@@ -22,6 +22,7 @@ export class Identifier {
       await w.setParameters({ tessedit_pageseg_mode: '7', tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz,'- ", preserve_interword_spaces: '1' });
       this.sched.addWorker(w); progress && progress();
     }));
+    await Promise.all([this.printsReady, this.artReady]); // don't say Ready before the local indexes are in (avoids image downloads)
   }
   // ---------- image helpers
   matToCanvas(m) { const c = mk(m.cols, m.rows); const g = c.getContext('2d'); const id = new ImageData(new Uint8ClampedArray(m.data), m.cols, m.rows); g.putImageData(id, 0, 0); return c; }
@@ -71,7 +72,8 @@ export class Identifier {
       const im = await loadImg(url).catch(() => null); if (!im) return null;
       const f = this.feat(im); kvSet(k, { full: Array.from(f.full), art: Array.from(f.art) }); return f;
     })();
-    this.featCache.set(card.id, p); return p;
+    this.featCache.set(card.id, p); p.then(f => { if (!f) this.featCache.delete(card.id); }, () => this.featCache.delete(card.id)); // retry later
+    return p;
   }
   // ---------- main
   async identifyCanvas(input, opts = {}) {
@@ -84,7 +86,8 @@ export class Identifier {
     else if (n === 1) {
       // choose the most central big quad, else fall back to the guide box
       if (quads.length > 1) quads.sort((a, b) => qarea(b) - qarea(a)); // biggest card in view
-      quads = quads.slice(0, 1).map(q => ({ q, detected: true }));
+      // other outlines in view (a pile of cards, a sleeve, a binder pocket) are tried when the biggest one doesn't read confidently
+      quads = quads.slice(0, 1).map(q => ({ q, detected: true, others: quads.slice(1, 3) }));
       if (!quads.length) quads = [{ q: guide || centerQuad(src.cols, src.rows), detected: false }];
     } else {
       const cols = Math.sqrt(n), cells = gridQuads(src.cols, src.rows, cols, cols, 0.03);
@@ -93,19 +96,21 @@ export class Identifier {
       quads = slot.map((s, i) => s || { q: cells[i], detected: false });
     }
     const tDetect = performance.now() - t0;
-    const results = await Promise.all(quads.map(async ({ q, detected }, i) => {
+    const one = async ({ q, detected, others = [] }, i) => {
       const w = warpCard(cv, src, q); const card = this.matToCanvas(w); w.delete();
-      let r = await this.identifyCard(card); let used = q, cardC = card;
-      const alts = [q.inner, shrink(q, 0.03)].filter(Boolean);
+      let r = await this.identifyCard(card); let used = q, cardC = card, altIdx = -1, tried = 1; const firstMs = r.ms;
+      const alts = [q.inner, ...(q.nest || []).slice(0, 3), ...others, shrink(q, 0.03)].filter(Boolean);
       for (const aq of alts) { // sleeve edge / loose crop: retry tighter if not confident
         if (r.conf === 'high' || (r.conf === 'medium' && !r.viaArt)) break;
         const w2 = warpCard(cv, src, aq); const c2 = this.matToCanvas(w2); w2.delete();
-        const r2 = await this.identifyCard(c2);
-        if (r2.match && (!r.match || (r2.combined ?? -9) > (r.combined ?? -9))) { r = r2; used = aq; cardC = c2; }
+        const r2 = await this.identifyCard(c2); tried++;
+        if (r2.match && (!r.match || (r2.combined ?? -9) > (r.combined ?? -9))) { r = r2; used = aq; cardC = c2; altIdx = alts.indexOf(aq); }
       }
-      return { ...r, quad: used, detected, slot: i, cardCanvas: cardC };
-    }));
-    src.delete();
+      return { ...r, quad: used, detected, slot: i, cardCanvas: cardC, altIdx, tried, firstMs, nAlts: alts.length };
+    };
+    const results = new Array(quads.length); let next = 0;
+    try { await Promise.all(Array.from({ length: Math.min(quads.length, this.cardConc || 3) }, async () => { while (next < quads.length) { const i = next++; results[i] = await one(quads[i], i); } })); }
+    finally { src.delete(); }
     return { results: results.filter(r => r.match || r.detected), ms: performance.now() - t0, tDetect };
   }
   // OCR the title bar with several preprocessing variants and pool the candidate names.
@@ -179,7 +184,8 @@ export class Identifier {
     const top = scored[0].s;
     // ambiguous printings (same art reprints): lean to old frame, then oldest
     const near = scored.filter(x => x.s >= top - 0.03);
-    const pick = near.find(x => isOldFrame(x.p)) || near[0];
+    const tie = scored.filter(x => x.s >= top - 0.008); const reprint = p => /^(plst|plist|sld|slx|prm|pmei|ppro|plg\d*|pura)$/.test(p.set) || /^p/.test(p.set) && p.set.length === 4;
+    const pick = tie.length > 1 ? (tie.find(x => !reprint(x.p)) || tie[0]) : scored[0];
     const margin = bestAll.combined - (allComb.sort((a, b) => b - a)[1] ?? -1);
     const conf = !nc.art && pick.s >= 0.85 && nc.eff < 0.45 && margin > 0.1 ? 'high' : nc.art ? (pick.s >= 0.85 && margin > 0.08 ? 'high' : pick.s >= 0.7 && margin > 0.03 ? 'medium' : 'low') : bestAll.scored[0].s < 0.35 && nc.eff > 0.15 ? 'low' : nc.eff < 0.15 && (scored.length === 1 || near.length === 1 || top - (scored.find(x => !near.includes(x))?.s ?? 0) > 0.05) ? 'high' : nc.score < 0.3 ? 'medium' : 'low';
     return { match: pick.p, viaArt: !!nc.art, combined: bestAll.combined, alts: scored.slice(0, 40).map(x => x.p), printAmbiguous: near.length > 1, nameScore: nc.eff, imgSim: pick.s, conf, ocr: rd.text, ms: performance.now() - t0 };
@@ -188,7 +194,7 @@ export class Identifier {
 function mk(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 function normVec(d) { const n = d.length / 4, v = new Float32Array(n * 3); for (let ch = 0; ch < 3; ch++) { let m = 0; for (let i = 0; i < n; i++) m += d[i * 4 + ch]; m /= n; let s = 0; for (let i = 0; i < n; i++) { const x = d[i * 4 + ch] - m; v[ch * n + i] = x; s += x * x; } s = Math.sqrt(s) || 1; for (let i = 0; i < n; i++) v[ch * n + i] /= s * Math.sqrt(3); } return v; }
 function dot(a, b) { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; }
-function loadImg(url) { return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
+function loadImg(url, ms = 3000) { return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; const done = (f, v) => { clearTimeout(tm); i.onload = i.onerror = null; f(v); }; const tm = setTimeout(() => { done(rej, new Error('Image timeout')); i.src = ''; }, ms); i.onload = () => done(res, i); i.onerror = () => done(rej, new Error('Image unavailable')); i.src = url; }); }
 const ctr = q => [q.reduce((s, p) => s + p[0], 0) / 4, q.reduce((s, p) => s + p[1], 0) / 4];
 const dc = (q, x, y) => { const c = ctr(q); return Math.hypot(c[0] - x, c[1] - y); };
 function centerQuad(W, H) { let h = H * 0.86, w = h * RATIO; if (w > W * 0.9) { w = W * 0.9; h = w / RATIO; } const x = (W - w) / 2, y = (H - h) / 2; return [[x, y], [x + w, y], [x + w, y + h], [x, y + h]]; }

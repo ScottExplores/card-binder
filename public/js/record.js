@@ -48,7 +48,7 @@ export async function processVideo(idf, blob, { step = 0.2, onProgress = () => {
     // skip cards already read confidently at the same spot in this scene; reuse that read as an extra sighting
     const ctrOf = q => [q.reduce((s, p) => s + p[0], 0) / 4 / c.width, q.reduce((s, p) => s + p[1], 0) / 4 / c.height];
     const todo = [];
-    for (const q of quads) { const cc = ctrOf(q); const k = seen.find(x => x.scene === f.scene && x.conf !== 'low' && Math.hypot(x.ctr[0] - cc[0], x.ctr[1] - cc[1]) < 0.06); if (k) seen.push({ ...k, t: f.t, ctr: cc, frame: i }); else todo.push(q); }
+    for (const q of quads) { const cc = ctrOf(q); const k = seen.find(x => x.scene === f.scene && x.conf !== 'low' && Math.hypot(x.ctr[0] - cc[0], x.ctr[1] - cc[1]) < 0.06); if (k) seen.push({ ...k, t: f.t, ctr: cc, frame: i, reused: true }); else todo.push(q); } // reused reads are not counted as extra evidence
     if (!todo.length) continue;
     const r = await idf.identifyCanvas(c, { mode: 'multi', quads: todo });
     for (const x of r.results) { if (!x.match) continue; const q = x.quad; const ctr = [q.reduce((s, p) => s + p[0], 0) / 4 / c.width, q.reduce((s, p) => s + p[1], 0) / 4 / c.height]; seen.push({ ...x, t: f.t, ctr, frame: i, scene: f.scene }); }
@@ -61,16 +61,93 @@ export async function processVideo(idf, blob, { step = 0.2, onProgress = () => {
 export function dedupe(seen) {
   const rank = { high: 3, medium: 2, low: 1 }; const groups = [];
   for (const s of seen.sort((a, b) => a.t - b.t)) {
-    const g = groups.find(g => g.name === s.match.name && s.t - g.lastT < 3 && !g.frames.has(s.frame) && Math.hypot(g.ctr[0] - s.ctr[0], g.ctr[1] - s.ctr[1]) < 0.5);
-    if (g) { g.lastT = s.t; g.frames.add(s.frame); g.ctr = s.ctr; g.n++; g.hits.push(s); continue; }
-    groups.push({ name: s.match.name, lastT: s.t, frames: new Set([s.frame]), ctr: s.ctr, n: 1, hits: [s] });
+    const g = groups.find(g => g.scene === s.scene && g.name === s.match.name && s.t - g.lastT < 3 && !g.frames.has(s.frame) && Math.hypot(g.ctr[0] - s.ctr[0], g.ctr[1] - s.ctr[1]) < 0.08);
+    if (g) { g.lastT = s.t; g.frames.add(s.frame); g.ctr = s.ctr; if (!s.reused) g.n++; g.hits.push(s); continue; }
+    groups.push({ scene: s.scene, name: s.match.name, lastT: s.t, frames: new Set([s.frame]), ctr: s.ctr, n: 1, hits: [s] });
   }
   // a low-confidence one-off next to a confident read of a different card at the same spot is usually a misread: keep it but unchecked
   return groups.map(g => {
     const best = g.hits.reduce((a, b) => ((rank[b.conf] - rank[a.conf]) || ((b.imgSim ?? 0) - (a.imgSim ?? 0))) > 0 ? b : a);
-    const votes = {}; for (const h of g.hits) votes[h.match.id] = (votes[h.match.id] || 0) + rank[h.conf];
+    const votes = {}; for (const h of g.hits.filter(h => !h.reused)) votes[h.match.id] = (votes[h.match.id] || 0) + rank[h.conf];
     const pid = Object.entries(votes).sort((a, b) => b[1] - a[1])[0][0]; const pick = g.hits.find(h => h.match.id === pid) || best;
     const conf = g.n >= 2 && best.conf !== 'low' ? 'high' : best.conf;
     return { ...pick, conf, sightings: g.n, t: g.hits[0].t };
   });
 }
+
+// Deck mode: cards are dealt (or flipped) one at a time under the camera. Every steady "hold" between two movements is one card,
+// so runs of the same card (basic lands) are counted correctly. The video is played through once (no seeking: phone videos seek slowly);
+// the two sharpest full-size frames of each hold are kept, and the card is read as soon as the hold ends.
+export async function processDeck(idf, blob, { step = 0.1, rate = 2, onProgress = () => {}, signal, T = {} } = {}) {
+  const P = { hold: 4.5, bump: 9, minHold: 2, ...T };
+  const cv = idf.cv; const t0 = performance.now();
+  const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = typeof blob === 'string' ? blob : URL.createObjectURL(blob);
+  document.body.appendChild(v); v.style.cssText = 'position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none';
+  try {
+    await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = () => rej(new Error('Can’t read that video')); });
+    if (!isFinite(v.duration)) { v.currentTime = 1e9; await new Promise(r => v.ondurationchange = r); v.currentTime = 0; await new Promise(r => v.onseeked = r); }
+    const dur = v.duration; const W = v.videoWidth, H = v.videoHeight;
+    const sc = Math.min(1, 1600 / Math.max(W, H)); const cw = W * sc | 0, ch = H * sc | 0;
+    const slots = [0, 1].map(() => { const c = document.createElement('canvas'); c.width = cw; c.height = ch; return { c, g: c.getContext('2d', { willReadFrequently: true }), sharp: -1 }; });
+    const tiny = document.createElement('canvas'); const ts = 320 / Math.max(cw, ch); tiny.width = cw * ts | 0; tiny.height = ch * ts | 0; const tg = tiny.getContext('2d', { willReadFrequently: true });
+    const diff = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += Math.abs(a[i] - b[i]); return s / a.length; };
+    const motion = [], reads = []; let prev = null, n = 0, hold = null, holds = 0;
+    const readHold = async h => {
+      holds++; let best = null;
+      for (const sl of slots.filter(x => x.sharp >= 0).sort((a, b) => b.sharp - a.sharp)) {
+        const r = await idf.identifyCanvas(sl.c, { mode: 'single' }); const x = r.results[0];
+        if (x?.match && (!best || rank(x) > rank(best))) best = x;
+        if (best && best.conf === 'high') break;
+        if (!x?.detected && !x?.match) break; // empty table: nothing to read here
+      }
+      if (window.__deckDbg) window.__deckDbg.push({ k: holds, conf: best?.conf, name: best?.match?.name, altIdx: best?.altIdx, tried: best?.tried, ms: best?.ms | 0 });
+      if (best?.match && (best.detected || best.conf !== 'low')) {
+        const cc = best.cardCanvas; let thumb = null; if (cc) { thumb = document.createElement('canvas'); thumb.width = 146; thumb.height = 204; thumb.getContext('2d').drawImage(cc, 0, 0, 146, 204); }
+        reads.push({ ...best, cardCanvas: thumb, t: h.t, start: h.start, end: h.end });
+      }
+    };
+    const sample = async t => {
+      tg.drawImage(v, 0, 0, tiny.width, tiny.height);
+      const m = cv.matFromImageData(tg.getImageData(0, 0, tiny.width, tiny.height)); const gr = new cv.Mat(); cv.cvtColor(m, gr, cv.COLOR_RGBA2GRAY);
+      const lap = new cv.Mat(); cv.Laplacian(gr, lap, cv.CV_32F); const mean = new cv.Mat(), sd = new cv.Mat(); cv.meanStdDev(lap, mean, sd); const sharp = sd.data64F[0] ** 2;
+      const sm = new cv.Mat(); cv.resize(gr, sm, new cv.Size(32, 24), 0, 0, cv.INTER_AREA); const thumb = Uint8Array.from(sm.data);
+      [m, gr, lap, mean, sd, sm].forEach(x => x.delete());
+      const mo = prev ? diff(thumb, prev) : 99; prev = thumb; motion.push(mo); const i = n++;
+      if (mo < P.hold) {
+        if (!hold) { hold = { start: i, end: i, t, len: 0 }; slots.forEach(s => s.sharp = -1); }
+        hold.end = i; hold.len++;
+        const worst = slots.reduce((a, b) => a.sharp <= b.sharp ? a : b);
+        if (sharp > worst.sharp) { worst.g.drawImage(v, 0, 0, cw, ch); worst.sharp = sharp; }
+      } else if (hold) { const h = hold; hold = null; if (h.len >= P.minHold) { v.pause(); await readHold(h); } }
+      else { hold = null; }
+      // a hold can start on the moving frame's successor; also seed it with this frame's image
+      if (mo >= P.hold) { hold = { start: i, end: i, t, len: 0 }; slots.forEach(s => s.sharp = -1); slots[0].g.drawImage(v, 0, 0, cw, ch); slots[0].sharp = sharp * 0.5; }
+      onProgress(Math.min(0.99, t / dur), `Reading… ${reads.length} card${reads.length === 1 ? '' : 's'} so far`);
+    };
+    await new Promise((resolve, reject) => {
+      let last = -1, busy = false, ended = false;
+      const finish = async () => { if (hold && hold.len >= P.minHold) { const h = hold; hold = null; await readHold(h); } resolve(); };
+      const tick = async () => {
+        if (signal?.aborted) { v.pause(); return reject(new Error('Cancelled')); }
+        const t = v.currentTime;
+        if (!busy && t - last >= step - 0.005) { busy = true; last = t; try { await sample(t); } catch (e) { return reject(e); } busy = false; if (v.paused && !ended) v.play().catch(() => {}); }
+        if (ended) return finish();
+        if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(tick); else setTimeout(tick, 16);
+      };
+      v.onended = () => { ended = true; if (!busy) finish(); };
+      v.playbackRate = rate; v.play().then(() => tick()).catch(reject);
+    });
+    // a hand bump splits one hold in two: same card, tiny gap, small movement => merge
+    const out = [];
+    for (const r of reads) {
+      const prevR = out[out.length - 1];
+      if (prevR && prevR.match.name === r.match.name) {
+        const gap = motion.slice(prevR.end + 1, r.start + 1);
+        if (gap.length <= 1 && Math.max(0, ...gap) < P.bump) { if (rank(r) > rank(prevR)) Object.assign(prevR, { ...r, start: prevR.start }); else prevR.end = r.end; prevR.sightings = (prevR.sightings || 1) + 1; continue; }
+      }
+      out.push({ ...r, sightings: 1 });
+    }
+    return { cards: out, frames: motion.length, holds, ms: performance.now() - t0, duration: dur, motion };
+  } finally { v.pause(); v.remove(); if (typeof blob !== 'string') URL.revokeObjectURL(v.src); }
+}
+const rank = x => ({ high: 3, medium: 2, low: 1 }[x.conf] || 0) + (x.imgSim || 0) * 0.5;

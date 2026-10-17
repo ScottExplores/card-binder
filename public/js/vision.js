@@ -96,6 +96,8 @@ export function detectCards(cv, src, { maxCards = 9, minAreaFrac = 0.02, fast = 
       // nested: if this one is close in size, it's the card inside a sleeve -> replace with inner (tighter)
       // nested quad: keep the outer outline, remember a close-fitting inner one (card inside a sleeve / inner frame)
       if (c.area > host.area * 0.78 && c.area < host.area * 0.97 && (!host.inner || c.area > host.innerArea)) { host.inner = c.quad; host.innerArea = c.area; }
+      // any other card-sized outline inside (top card of a pile, card inside a loose sleeve): tried if the outer one reads badly
+      else if (c.area > host.area * 0.4 && c.area < host.area * 0.97 && (host.nest ||= []).length < 4 && !host.nest.some(n => Math.abs(n.area - c.area) < c.area * 0.04)) host.nest.push(c);
       continue;
     }
     if (kept.some(k => inside(center(k.quad), { quad: c.quad }.quad))) continue;
@@ -104,7 +106,7 @@ export function detectCards(cv, src, { maxCards = 9, minAreaFrac = 0.02, fast = 
   // keep cards of similar size to the biggest (binder pages) and cap the count
   let res = kept;
   if (res.length > 1) { const med = res.map(r => r.area).sort((a, b) => b - a)[Math.min(res.length - 1, 1)]; res = res.filter(r => r.area > med * 0.45); }
-  res = res.slice(0, maxCards).map(r => { const q = r.quad.map(p => [p[0] / scale, p[1] / scale]); if (r.inner) q.inner = r.inner.map(p => [p[0] / scale, p[1] / scale]); return q; });
+  res = res.slice(0, maxCards).map(r => { const q = r.quad.map(p => [p[0] / scale, p[1] / scale]); if (r.inner) q.inner = r.inner.map(p => [p[0] / scale, p[1] / scale]); if (r.nest) q.nest = r.nest.map(n => n.quad.map(p => [p[0] / scale, p[1] / scale])); return q; });
   // reading order: rows by y then x
   res.sort((a, b) => center(a)[1] - center(b)[1]);
   const rows = []; for (const q of res) { const r = rows.find(r => Math.abs(center(r[0])[1] - center(q)[1]) < quadStats(q).h * 0.5); r ? r.push(q) : rows.push([q]); }
