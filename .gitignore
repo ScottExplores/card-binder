@@ -9,3 +9,4 @@ build/printvec.f32
 bench/*.mp4
 bench/*.webm
 build/dl_all.log
+build/oracle.jsonl.gz
