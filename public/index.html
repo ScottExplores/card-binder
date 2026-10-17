@@ -31,11 +31,12 @@
         <button id="tg-foil" class="chip" aria-pressed="false">Foil</button>
         <button id="tg-torch" class="chip" aria-pressed="false" hidden>Light</button>
         <button id="tg-price" class="chip" aria-pressed="false" title="Just show the price, don't add to the binder">$ Price</button>
-        <button id="tg-rec" class="chip rec" aria-pressed="false" title="Record a video sweeping over your cards, then review them all at once">● Rec</button>
+        <button id="tg-rec" class="chip rec" aria-pressed="false" title="Record a video: deal cards one at a time (or sweep binder pages), then review them all at once">● Rec</button>
       </div>
     </div>
     <div class="scan-bottom">
       <div id="pcard" class="pcard" hidden></div>
+      <div class="tray-head"><button id="dest-chip" class="chip sm dest" title="Where scanned cards go">Into: Unsorted ▾</button><button id="btn-last" class="chip sm" hidden>Last scan</button><span id="deck-live" class="deck-live" hidden></span></div>
       <div id="tray" class="tray"></div>
       <div class="shutter-row">
         <div class="lefty"><label class="btn ghost small" title="Scan a photo from your gallery">Photo<input id="file-in" type="file" accept="image/*" hidden></label><label class="btn ghost small" title="Process a video of your cards">Video<input id="vid-in" type="file" accept="video/*" hidden></label></div>
@@ -48,22 +49,25 @@
   <!-- BINDER -->
   <section id="v-binder" class="view">
     <header class="bar">
-      <input id="q" type="search" placeholder="Search your binder" autocomplete="off">
-      <div class="row">
-        <button id="f-over5" class="chip" aria-pressed="false">Over $5</button>
-        <select id="sort">
-          <option value="value">Value</option><option value="name">Name</option><option value="set">Set</option><option value="added">Newest</option>
-        </select>
-        <div class="seg small" id="view-seg"><button data-v="list" class="on">List</button><button data-v="pages">Pages</button></div>
+      <input id="q" type="search" placeholder="Search your cards" autocomplete="off">
+      <div class="row scroll">
+        <button id="f-open" class="chip">Filters</button>
+        <button id="f-last" class="chip" aria-pressed="false">Last scan</button>
+        <button id="f-over5" class="chip" aria-pressed="false">$5+</button>
+        <select id="sort" aria-label="Sort"></select>
       </div>
+      <div class="row scroll" id="binder-chips"></div>
     </header>
-    <div id="binder-sum" class="sum"></div>
+    <div class="sum-row"><div id="binder-sum" class="sum"></div><span class="sum-r"><div class="seg small" id="view-seg"><button data-v="list" class="on">List</button><button data-v="pages">Pages</button></div><button id="btn-piles" class="btn small ghost">Sort piles</button></span></div>
     <div id="list" class="list"></div>
     <div id="pages" class="pages" hidden>
       <div id="page-grid" class="page-grid"></div>
       <div class="pager"><button id="pg-prev" class="btn ghost">‹ Prev</button><span id="pg-num"></span><button id="pg-next" class="btn ghost">Next ›</button></div>
     </div>
   </section>
+
+  <!-- DECKS -->
+  <section id="v-decks" class="view"><div id="decks-body" class="decks"></div></section>
 
   <!-- VALUE -->
   <section id="v-value" class="view">
@@ -73,6 +77,8 @@
       <div id="total-sub" class="sub"></div>
       <div id="prices-age" class="sub small"></div>
     </div>
+    <div id="piles-sum" class="piles-sum"></div>
+    <div id="sales-sum" class="sales-sum" hidden></div>
     <div class="value-actions">
       <button id="btn-refresh" class="btn big">Refresh prices</button>
       <button id="btn-export" class="btn big">Export…</button>
@@ -86,6 +92,7 @@
   <nav class="tabs">
     <button data-tab="scan" class="on"><span class="ic">◉</span>Scan</button>
     <button data-tab="binder"><span class="ic">▦</span>Binder</button>
+    <button data-tab="decks"><span class="ic">▤</span>Decks</button>
     <button data-tab="value"><span class="ic">$</span>Value</button>
   </nav>
 </div>
