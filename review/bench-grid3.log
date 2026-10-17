@@ -1,0 +1,55 @@
+[page] Failed to load resource: the server responded with a status of 404 (File not found)
+[http] 404 http://localhost:8765/favicon.ico
+[page] loading cv
+[page] init tess
+[page] worker up
+[page] worker up
+[page] worker up
+[page] worker up
+[page] ready to run
+[page] Bottom=0, top=80, base=0, x=0
+[page] 
+[page] Total count=0
+[page] Min=0.00 Really=0
+[page] Lower quartile=0.00
+[page] Median=0.00, ile(0.5)=0.00
+[page] Upper quartile=0.00
+[page] Max=0.00 Really=0
+[page] Range=1
+[page] Mean= 0.00
+[page] SD= 0.00
+[page] Bottom=0, top=80, base=0, x=0
+[page] 
+[page] Total count=0
+[page] Min=0.00 Really=0
+[page] Lower quartile=0.00
+[page] Median=0.00, ile(0.5)=0.00
+[page] Upper quartile=0.00
+[page] Max=0.00 Really=0
+[page] Range=1
+[page] Mean= 0.00
+[page] SD= 0.00
+[page] Bottom=0, top=80, base=0, x=0
+[page] 
+[page] Total count=0
+[page] Min=0.00 Really=0
+[page] Lower quartile=0.00
+[page] Median=0.00, ile(0.5)=0.00
+[page] Upper quartile=0.00
+[page] Max=0.00 Really=0
+[page] Range=1
+[page] Mean= 0.00
+[page] SD= 0.00
+3/3
+cards 27  name 92.6%  exact printing 88.9%  printing in top5 92.6%
+per-image ms: median 3759, p90 5485; wall 13.711s
+grid3                          27 name  92.6% print  88.9%
+grid3:clean                     9 name  88.9% print  77.8%
+grid3:sleeve+foil               9 name  88.9% print  88.9%
+grid3:sleeve                    9 name 100.0% print 100.0%
+group:dfc                       1 name 100.0% print 100.0%
+group:m03                       3 name  66.7% print  66.7%
+group:modern                    9 name 100.0% print  88.9%
+group:old93                     7 name  85.7% print  85.7%
+group:old97                     6 name 100.0% print 100.0%
+group:showcase                  1 name 100.0% print 100.0%

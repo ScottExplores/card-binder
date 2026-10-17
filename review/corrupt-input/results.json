@@ -1,0 +1,63 @@
+{
+  "mode": "single photo; initial foil toggle OFF",
+  "offline": true,
+  "workers": 4,
+  "initMs": 1220.586094,
+  "summary": {
+    "cards": 1,
+    "nameAccuracy": 0,
+    "exactPrintingAccuracy": 0,
+    "top5PrintingAccuracy": 0,
+    "autoAdded": 0,
+    "autoAddErrorRate": null,
+    "autoAddWrongNameRate": null,
+    "autoAddWrongPrintingRate": null,
+    "autoAddCoverage": 0,
+    "finishLabeled": 0,
+    "finishAccuracy": null,
+    "avgIdentifyMs": null,
+    "avgTotalMs": 5.299999998882413,
+    "errors": 1
+  },
+  "byFrameEra": {
+    "old frame (1993)": {
+      "cards": 1,
+      "nameAccuracy": 0,
+      "exactPrintingAccuracy": 0,
+      "top5PrintingAccuracy": 0,
+      "autoAdded": 0,
+      "autoAddErrorRate": null,
+      "autoAddWrongNameRate": null,
+      "autoAddWrongPrintingRate": null,
+      "autoAddCoverage": 0,
+      "finishLabeled": 0,
+      "finishAccuracy": null,
+      "avgIdentifyMs": null,
+      "avgTotalMs": 5.299999998882413,
+      "errors": 1
+    }
+  },
+  "results": [
+    {
+      "filename": "bad.jpg",
+      "era": "old frame (1993)",
+      "truth": {
+        "id": "2e820f3f-434e-4d09-91b9-0ebd6966b393",
+        "name": "Tidal Flats",
+        "set": "fem",
+        "collector_number": "27a",
+        "finish": null
+      },
+      "prediction": {
+        "error": "EncodingError: The source image cannot be decoded.",
+        "totalMs": 5.299999998882413,
+        "finish": null
+      },
+      "nameOK": false,
+      "exactOK": false,
+      "top5OK": false,
+      "autoAdded": false,
+      "finishOK": null
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+import puppeteer from 'puppeteer-core'; import { spawn } from 'child_process';
+const srv = spawn('python3', ['-m', 'http.server', '8772', '-d', 'public'], { stdio: 'ignore' }); await new Promise(r => setTimeout(r, 800));
+const br = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: 'new', args: ['--no-sandbox'], protocolTimeout: 600000 });
+const pg = await br.newPage(); await pg.setViewport({ width: 412, height: 915, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+const errs = []; pg.on('pageerror', e => errs.push(e.message));
+await pg.goto(process.env.BASE || 'http://localhost:8772/'); await pg.waitForFunction(() => document.querySelector('#scan-status').textContent === 'Ready', { timeout: 120000 });
+const inp = await pg.$('#vid-in'); await inp.uploadFile(process.argv[2] || 'bench/video2.mp4');
+await pg.waitForSelector('#rv-add', { timeout: 600000 }); await pg.screenshot({ path: 'screens/video-review.png' });
+const n = await pg.$$eval('.rv-it', e => e.length); await pg.click('#rv-add'); await new Promise(r => setTimeout(r, 1000));
+console.log('review items', n, 'toast', await pg.$eval('#toast', e => e.textContent), 'errors', errs); await br.close(); srv.kill();

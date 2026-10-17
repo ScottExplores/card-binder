@@ -1,0 +1,24 @@
+[
+ {
+  "file": "scenes/g3_000.jpg",
+  "slot": 0,
+  "want": "Vampire Bats",
+  "got": "Swamp",
+  "ocr": "So | ai se RTE SY | RC te SH HB | So | YE a MS ET LE TE UE ES mn ne ie Ak nat | FRE RE FA | PREG Fa Late A dil",
+  "det": false,
+  "ns": 0.42,
+  "sim": 0.7050844314380618,
+  "art": true
+ },
+ {
+  "file": "scenes/g3_002.jpg",
+  "slot": 0,
+  "want": "Fasting",
+  "got": "Viridian Shaman",
+  "ocr": "WON | i neh AN | he Ba PE WP | BRR Wr | ma TI ra | HARKS | pet ST rr A hE PA",
+  "det": true,
+  "ns": 0.42,
+  "sim": 0.8389575452443788,
+  "art": true
+ }
+]

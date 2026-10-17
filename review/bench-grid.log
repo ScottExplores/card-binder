@@ -1,0 +1,21 @@
+[http] 404 http://localhost:8765/favicon.ico
+[page] Failed to load resource: the server responded with a status of 404 (File not found)
+[page] loading cv
+[page] init tess
+[page] worker up
+[page] worker up
+[page] worker up
+[page] worker up
+[page] ready to run
+3/3
+cards 12  name 91.7%  exact printing 66.7%  printing in top5 91.7%
+per-image ms: median 3581, p90 4118; wall 11.822s
+grid2                          12 name  91.7% print  66.7%
+grid2:sleeve+foil               4 name 100.0% print 100.0%
+grid2:sleeve+glare              4 name  75.0% print  25.0%
+grid2:sleeve                    4 name 100.0% print  75.0%
+group:dfc                       4 name 100.0% print  75.0%
+group:modern                    2 name 100.0% print 100.0%
+group:old93                     4 name  75.0% print  25.0%
+group:old97                     1 name 100.0% print 100.0%
+group:showcase                  1 name 100.0% print 100.0%

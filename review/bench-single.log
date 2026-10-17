@@ -1,0 +1,57 @@
+[http] 404 http://localhost:8765/favicon.ico
+[page] Failed to load resource: the server responded with a status of 404 (File not found)
+[page] loading cv
+[page] init tess
+[page] worker up
+[page] worker up
+[page] worker up
+[page] worker up
+[page] ready to run
+[page] Bottom=0, top=80, base=0, x=0
+[page] 
+[page] Total count=0
+[page] Min=0.00 Really=0
+[page] Lower quartile=0.00
+[page] Median=0.00, ile(0.5)=0.00
+[page] Upper quartile=0.00
+[page] Max=0.00 Really=0
+[page] Range=1
+[page] Mean= 0.00
+[page] SD= 0.00
+[page] Bottom=0, top=80, base=0, x=0
+[page] 
+[page] Total count=0
+[page] Min=0.00 Really=0
+[page] Lower quartile=0.00
+[page] Median=0.00, ile(0.5)=0.00
+[page] Upper quartile=0.00
+[page] Max=0.00 Really=0
+[page] Range=1
+[page] Mean= 0.00
+[page] SD= 0.00
+[page] Bottom=0, top=80, base=0, x=0
+[page] 
+[page] Total count=0
+[page] Min=0.00 Really=0
+[page] Lower quartile=0.00
+[page] Median=0.00, ile(0.5)=0.00
+[page] Upper quartile=0.00
+[page] Max=0.00 Really=0
+[page] Range=1
+[page] Mean= 0.00
+[page] SD= 0.00
+10/12[page] loading cv
+[page] ready to run
+12/12
+cards 12  name 100.0%  exact printing 91.7%  printing in top5 100.0%
+per-image ms: median 352, p90 413; wall 6.466s
+group:old93                    12 name 100.0% print  91.7%
+single                         12 name 100.0% print  91.7%
+single:angled+glare             1 name 100.0% print 100.0%
+single:angled+sleeve            1 name 100.0% print 100.0%
+single:angled                   2 name 100.0% print 100.0%
+single:clean                    2 name 100.0% print 100.0%
+single:foil                     1 name 100.0% print 100.0%
+single:glare                    2 name 100.0% print 100.0%
+single:sleeve+foil              1 name 100.0% print   0.0%
+single:sleeve                   2 name 100.0% print 100.0%

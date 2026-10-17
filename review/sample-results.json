@@ -1,0 +1,239 @@
+{
+  "mode": "single photo; initial foil toggle OFF",
+  "offline": true,
+  "workers": 4,
+  "initMs": 1260.786681,
+  "summary": {
+    "cards": 5,
+    "nameAccuracy": 1,
+    "exactPrintingAccuracy": 0.8,
+    "top5PrintingAccuracy": 1,
+    "autoAdded": 5,
+    "autoAddErrorRate": 0.2,
+    "autoAddWrongNameRate": 0,
+    "autoAddWrongPrintingRate": 0.2,
+    "autoAddCoverage": 1,
+    "finishLabeled": 0,
+    "finishAccuracy": null,
+    "avgIdentifyMs": 382.3599999997765,
+    "avgTotalMs": 395.15999999940396,
+    "errors": 0
+  },
+  "byFrameEra": {
+    "old frame (1993)": {
+      "cards": 3,
+      "nameAccuracy": 1,
+      "exactPrintingAccuracy": 1,
+      "top5PrintingAccuracy": 1,
+      "autoAdded": 3,
+      "autoAddErrorRate": 0,
+      "autoAddWrongNameRate": 0,
+      "autoAddWrongPrintingRate": 0,
+      "autoAddCoverage": 1,
+      "finishLabeled": 0,
+      "finishAccuracy": null,
+      "avgIdentifyMs": 311.19999999987584,
+      "avgTotalMs": 323.8999999991308,
+      "errors": 0
+    },
+    "modern (2015)": {
+      "cards": 1,
+      "nameAccuracy": 1,
+      "exactPrintingAccuracy": 0,
+      "top5PrintingAccuracy": 1,
+      "autoAdded": 1,
+      "autoAddErrorRate": 1,
+      "autoAddWrongNameRate": 0,
+      "autoAddWrongPrintingRate": 1,
+      "autoAddCoverage": 1,
+      "finishLabeled": 0,
+      "finishAccuracy": null,
+      "avgIdentifyMs": 242.09999999962747,
+      "avgTotalMs": 255.90000000037253,
+      "errors": 0
+    },
+    "full-art/borderless (combined DB flag)": {
+      "cards": 1,
+      "nameAccuracy": 1,
+      "exactPrintingAccuracy": 1,
+      "top5PrintingAccuracy": 1,
+      "autoAdded": 1,
+      "autoAddErrorRate": 0,
+      "autoAddWrongNameRate": 0,
+      "autoAddWrongPrintingRate": 0,
+      "autoAddCoverage": 1,
+      "finishLabeled": 0,
+      "finishAccuracy": null,
+      "avgIdentifyMs": 736.0999999996275,
+      "avgTotalMs": 748.1999999992549,
+      "errors": 0
+    }
+  },
+  "results": [
+    {
+      "filename": "s000.jpg",
+      "era": "old frame (1993)",
+      "truth": {
+        "id": "2e820f3f-434e-4d09-91b9-0ebd6966b393",
+        "name": "Tidal Flats",
+        "set": "fem",
+        "collector_number": "27a",
+        "finish": null
+      },
+      "prediction": {
+        "ms": 353.09999999962747,
+        "totalMs": 367.2999999988824,
+        "id": "2e820f3f-434e-4d09-91b9-0ebd6966b393",
+        "name": "Tidal Flats",
+        "set": "fem",
+        "collector_number": "27a",
+        "fin": "n",
+        "conf": "high",
+        "ambiguous": false,
+        "top5": [
+          "2e820f3f-434e-4d09-91b9-0ebd6966b393",
+          "50e7d376-3e22-44aa-9c96-a3b8eb1568fe",
+          "445c4767-6261-449c-bb57-713e2a2bb0bf"
+        ],
+        "finish": "nonfoil"
+      },
+      "nameOK": true,
+      "exactOK": true,
+      "top5OK": true,
+      "autoAdded": true,
+      "finishOK": null
+    },
+    {
+      "filename": "s210.jpg",
+      "era": "modern (2015)",
+      "truth": {
+        "id": "9764a718-1748-4c2a-925c-370e22003b62",
+        "name": "Drudge Sentinel",
+        "set": "dom",
+        "collector_number": "89",
+        "finish": null
+      },
+      "prediction": {
+        "ms": 242.09999999962747,
+        "totalMs": 255.90000000037253,
+        "id": "13cacdf2-d325-444a-900b-2d0f90c89ca2",
+        "name": "Drudge Sentinel",
+        "set": "plst",
+        "collector_number": "DOM-89",
+        "fin": "n",
+        "conf": "high",
+        "ambiguous": true,
+        "top5": [
+          "13cacdf2-d325-444a-900b-2d0f90c89ca2",
+          "9764a718-1748-4c2a-925c-370e22003b62"
+        ],
+        "finish": "nonfoil"
+      },
+      "nameOK": true,
+      "exactOK": false,
+      "top5OK": true,
+      "autoAdded": true,
+      "finishOK": null
+    },
+    {
+      "filename": "s001.jpg",
+      "era": "old frame (1993)",
+      "truth": {
+        "id": "6f7a41cc-277a-4d95-a30c-91bf5aa7ac11",
+        "name": "Fellwar Stone",
+        "set": "4ed",
+        "collector_number": "319",
+        "finish": null
+      },
+      "prediction": {
+        "ms": 242.30000000074506,
+        "totalMs": 253.69999999925494,
+        "id": "6f7a41cc-277a-4d95-a30c-91bf5aa7ac11",
+        "name": "Fellwar Stone",
+        "set": "4ed",
+        "collector_number": "319",
+        "fin": "n",
+        "conf": "high",
+        "ambiguous": true,
+        "top5": [
+          "6f7a41cc-277a-4d95-a30c-91bf5aa7ac11",
+          "2716dacb-4fb7-4fa8-869d-22af82920564",
+          "dc47e322-f8b8-4685-b035-fda0cc433e6b",
+          "57cd70c4-17e9-4bbe-a8f8-2a29450835a9",
+          "5a8fd20a-d26e-417f-b1b7-e7257cc5b22b"
+        ],
+        "finish": "nonfoil"
+      },
+      "nameOK": true,
+      "exactOK": true,
+      "top5OK": true,
+      "autoAdded": true,
+      "finishOK": null
+    },
+    {
+      "filename": "s002.jpg",
+      "era": "old frame (1993)",
+      "truth": {
+        "id": "c87cecd6-ea9d-4515-890c-262bb15e9f37",
+        "name": "Rubinia Soulsinger",
+        "set": "chr",
+        "collector_number": "83",
+        "finish": null
+      },
+      "prediction": {
+        "ms": 338.19999999925494,
+        "totalMs": 350.69999999925494,
+        "id": "c87cecd6-ea9d-4515-890c-262bb15e9f37",
+        "name": "Rubinia Soulsinger",
+        "set": "chr",
+        "collector_number": "83",
+        "fin": "n",
+        "conf": "high",
+        "ambiguous": false,
+        "top5": [
+          "c87cecd6-ea9d-4515-890c-262bb15e9f37",
+          "f13e8dc9-8d0f-4a2c-8c0e-be70a3a7dc8e",
+          "ce216785-aa81-44b4-9562-9b7eca743a0c",
+          "db128616-3ea9-426a-adfb-6c9f334f66ad"
+        ],
+        "finish": "nonfoil"
+      },
+      "nameOK": true,
+      "exactOK": true,
+      "top5OK": true,
+      "autoAdded": true,
+      "finishOK": null
+    },
+    {
+      "filename": "s363.jpg",
+      "era": "full-art/borderless (combined DB flag)",
+      "truth": {
+        "id": "6d84e2d4-38bf-4d46-99a6-37c2dda66b16",
+        "name": "Welcome to . . . // Jurassic Park",
+        "set": "rex",
+        "collector_number": "7",
+        "finish": null
+      },
+      "prediction": {
+        "ms": 736.0999999996275,
+        "totalMs": 748.1999999992549,
+        "id": "6d84e2d4-38bf-4d46-99a6-37c2dda66b16",
+        "name": "Welcome to . . . // Jurassic Park",
+        "set": "rex",
+        "collector_number": "7",
+        "fin": "nf",
+        "conf": "high",
+        "ambiguous": false,
+        "top5": [
+          "6d84e2d4-38bf-4d46-99a6-37c2dda66b16"
+        ],
+        "finish": "nonfoil"
+      },
+      "nameOK": true,
+      "exactOK": true,
+      "top5OK": true,
+      "autoAdded": true,
+      "finishOK": null
+    }
+  ]
+}

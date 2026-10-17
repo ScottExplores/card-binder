@@ -1,0 +1,23 @@
+
+> card-binder@1.0.0 test
+> node test/unit.mjs && node test/e2e.mjs
+
+ok csv parse quotes/newlines/BOM
+ok manabox import by scryfall id, set/cn, name; foil; qty; missing
+ok exports round-trip through parser
+ok name matching tolerates OCR noise
+ok dfc face names map to full name
+ok norm strips accents/punct
+6 tests passed
+ok round-trip exportGoldfish
+ok round-trip exportArchidekt
+ok round-trip exportDeckbox
+ok round-trip exportManaBoxCSV
+ok round-trip exportMoxfield
+ok tcgplayer + text
+scanned: Tidal Flats | 1 card in 0.3s
+printings offered: 3
+after import: [["Tidal Flats","fem",1],["Sol Ring","c21",2],["Necropotence","ice",1]]
+3x3 page added: 8 | 9 cards in 3.8s
+errors: []
+E2E OK
