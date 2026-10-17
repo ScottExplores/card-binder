@@ -4,10 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test/unit.mjs && node test/e2e.mjs",
+    "test": "node test/unit.mjs && node test/unit_v2.mjs && node test/commander/run.mjs test/commander/app-adapter.mjs && node test/e2e.mjs /tmp/cam.y4m /tmp && node test/e2e_deck.mjs /tmp",
     "bench": "node bench/run.mjs single 400 && node bench/run.mjs /g 70",
     "build:db": "cd build && python3 build_db.py",
-    "deploy": "bash deploy.sh"
+    "deploy": "bash deploy.sh",
+    "test:unit": "node test/unit.mjs && node test/unit_v2.mjs && node test/commander/run.mjs test/commander/app-adapter.mjs",
+    "bench:deck": "node bench/deck.mjs bench/deck1.mp4 && node bench/deck.mjs bench/deck2.mp4"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,6 @@
+{"video":"bench/deck1","thr":1,"T":{},"duration":51.6,"truth":56,"found":56,"count_exact":true,"correct_in_order":41,"recall":73.2,"precision":73.2,"unsure":13,"process_s":322.2,"holds":56,"frames":516}
+{"video":"bench/deck1","thr":1,"T":{},"duration":51.6,"truth":56,"found":56,"count_exact":true,"correct_in_order":55,"recall":98.2,"precision":98.2,"unsure":0,"process_s":297.5,"holds":56,"frames":516}
+{"video":"bench/deck1s","thr":1,"T":{},"duration":12.1,"truth":13,"found":14,"count_exact":false,"correct_in_order":13,"recall":100,"precision":92.9,"unsure":0,"process_s":71,"holds":14,"frames":121}
+{"video":"bench/deck1s","thr":1,"T":{},"duration":12.1,"truth":13,"found":14,"count_exact":false,"correct_in_order":13,"recall":100,"precision":92.9,"unsure":0,"process_s":23.3,"holds":14,"frames":110}
+{"video":"bench/deck1","thr":1,"T":{},"duration":51.6,"truth":56,"found":56,"count_exact":true,"correct_in_order":54,"recall":96.4,"precision":96.4,"unsure":0,"process_s":101.3,"holds":56,"frames":478}
+{"video":"bench/deck2","thr":1,"T":{},"duration":52.3,"truth":57,"found":57,"count_exact":true,"correct_in_order":56,"recall":98.2,"precision":98.2,"unsure":1,"process_s":100.9,"holds":57,"frames":481}

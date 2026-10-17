@@ -1,0 +1,2869 @@
+[
+  {
+    "id": "baseline-five",
+    "description": "Five-color commander with 99 basics",
+    "rule": "CR 903.4 / 903.5a",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-plains",
+    "description": "99 copies of Plains",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-island",
+    "description": "99 copies of Island",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Talrand, Sky Summoner"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Island",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-swamp",
+    "description": "99 copies of Swamp",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Ayara, First of Locthwain"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-mountain",
+    "description": "99 copies of Mountain",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Krenko, Mob Boss"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Mountain",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-forest",
+    "description": "99 copies of Forest",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Yeva, Nature's Herald"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Forest",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-wastes",
+    "description": "99 copies of Wastes",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-snow-covered-plains",
+    "description": "99 copies of Snow-Covered Plains",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Snow-Covered Plains",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-snow-covered-island",
+    "description": "99 copies of Snow-Covered Island",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Talrand, Sky Summoner"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Snow-Covered Island",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-snow-covered-swamp",
+    "description": "99 copies of Snow-Covered Swamp",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Ayara, First of Locthwain"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Snow-Covered Swamp",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-snow-covered-mountain",
+    "description": "99 copies of Snow-Covered Mountain",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Krenko, Mob Boss"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Snow-Covered Mountain",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-snow-covered-forest",
+    "description": "99 copies of Snow-Covered Forest",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Yeva, Nature's Herald"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Snow-Covered Forest",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "basic-snow-covered-wastes",
+    "description": "99 copies of Snow-Covered Wastes",
+    "rule": "CR 903.5b / 903.5d",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Snow-Covered Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "banned-Black-Lotus",
+    "description": "Black Lotus banned in app snapshot",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Black Lotus",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Black Lotus"
+        }
+      ]
+    }
+  },
+  {
+    "id": "banned-Mana-Crypt",
+    "description": "Mana Crypt banned in app snapshot",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Mana Crypt",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Mana Crypt"
+        }
+      ]
+    }
+  },
+  {
+    "id": "banned-Jeweled-Lotus",
+    "description": "Jeweled Lotus banned in app snapshot",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Jeweled Lotus",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Jeweled Lotus"
+        }
+      ]
+    }
+  },
+  {
+    "id": "banned-Dockside-Extortionist",
+    "description": "Dockside Extortionist banned in app snapshot",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Dockside Extortionist",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Dockside Extortionist"
+        }
+      ]
+    }
+  },
+  {
+    "id": "banned-Prophet-of-Kruphix",
+    "description": "Prophet of Kruphix banned in app snapshot",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Prophet of Kruphix",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Prophet of Kruphix"
+        }
+      ]
+    }
+  },
+  {
+    "id": "banned-Nadu",
+    "description": "Nadu, Winged Wisdom banned in app snapshot",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Nadu, Winged Wisdom",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Nadu, Winged Wisdom"
+        }
+      ]
+    }
+  },
+  {
+    "id": "banned-commander",
+    "description": "Banned legendary commander",
+    "rule": "CR 100.6 / 903.3",
+    "input": {
+      "commanders": [
+        "Rofellos, Llanowar Emissary"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Forest",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Rofellos, Llanowar Emissary"
+        }
+      ]
+    }
+  },
+  {
+    "id": "snapshot-legal-Lutri",
+    "description": "Lutri, the Spellchaser is legal according to local metadata",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Lutri, the Spellchaser",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "snapshot-legal-Coalition-Victory",
+    "description": "Coalition Victory is legal according to local metadata",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Coalition Victory",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "snapshot-legal-Braids",
+    "description": "Braids, Cabal Minion is legal according to local metadata",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Braids, Cabal Minion",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "snapshot-legal-Sol-Ring",
+    "description": "Sol Ring is legal according to local metadata",
+    "rule": "CR 100.6 / 903.1",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Sol Ring",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "hybrid-reject",
+    "description": "Both halves of hybrid count",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Kitchen Finks",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Kitchen Finks"
+        }
+      ]
+    }
+  },
+  {
+    "id": "hybrid-accept",
+    "description": "Hybrid permitted when both colors available",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Rhys the Redeemed"
+      ],
+      "cards": [
+        {
+          "name": "Kitchen Finks",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "monohybrid-reject",
+    "description": "Generic alternative does not erase black identity",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Beseech the Queen",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Beseech the Queen"
+        }
+      ]
+    }
+  },
+  {
+    "id": "phyrexian-reject",
+    "description": "Life payment alternative does not erase black identity",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Dismember",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Dismember"
+        }
+      ]
+    }
+  },
+  {
+    "id": "phyrexian-accept",
+    "description": "Black commander permits Dismember",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Ayara, First of Locthwain"
+      ],
+      "cards": [
+        {
+          "name": "Dismember",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "blue-phyrexian",
+    "description": "Phyrexian blue still needs blue",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Ayara, First of Locthwain"
+      ],
+      "cards": [
+        {
+          "name": "Gitaxian Probe",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Gitaxian Probe"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dfc-creature-reject",
+    "description": "Avacyn red back face counts",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Archangel Avacyn // Avacyn, the Purifier",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Archangel Avacyn // Avacyn, the Purifier"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dfc-creature-accept",
+    "description": "Five-color deck permits both Avacyn faces",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Archangel Avacyn // Avacyn, the Purifier",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "dfc-land",
+    "description": "Land front does not hide black back face",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Westvale Abbey // Ormendahl, Profane Prince",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Westvale Abbey // Ormendahl, Profane Prince"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dfc-equipment",
+    "description": "Equipment front does not hide black back face",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Elbrus, the Binding Blade // Withengar Unbound",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Elbrus, the Binding Blade // Withengar Unbound"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dfc-planeswalker",
+    "description": "Green front plus black back is black-green",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Yeva, Nature's Herald"
+      ],
+      "cards": [
+        {
+          "name": "Garruk Relentless // Garruk, the Veil-Cursed",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Garruk Relentless // Garruk, the Veil-Cursed"
+        }
+      ]
+    }
+  },
+  {
+    "id": "rules-symbol",
+    "description": "Artifact activated blue mana contributes to identity",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Memnarch",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Memnarch"
+        }
+      ]
+    }
+  },
+  {
+    "id": "extort-black",
+    "description": "Extort reminder hybrid ignored in black deck",
+    "rule": "CR 903.4b",
+    "input": {
+      "commanders": [
+        "Ayara, First of Locthwain"
+      ],
+      "cards": [
+        {
+          "name": "Crypt Ghast",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "extort-white",
+    "description": "Extort reminder hybrid ignored in white deck",
+    "rule": "CR 903.4b",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Blind Obedience",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "land-offcolor",
+    "description": "Land activated black mana is off-color",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Bojuka Bog",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Bojuka Bog"
+        }
+      ]
+    }
+  },
+  {
+    "id": "land-dual",
+    "description": "Both basic land types must be supported",
+    "rule": "CR 903.5c / 903.5d",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Hallowed Fountain",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Hallowed Fountain"
+        }
+      ]
+    }
+  },
+  {
+    "id": "dryad-arbor",
+    "description": "Green color indicator and Forest type count",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Dryad Arbor",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Dryad Arbor"
+        }
+      ]
+    }
+  },
+  {
+    "id": "colorless-land-Command-Tower",
+    "description": "Color words and any-color production add no identity: Command Tower",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Command Tower",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "colorless-land-City-of-Brass",
+    "description": "Color words and any-color production add no identity: City of Brass",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "City of Brass",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "colorless-land-Cascading-Cataracts",
+    "description": "Color words and any-color production add no identity: Cascading Cataracts",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Cascading Cataracts",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "colorless-land-Urborg",
+    "description": "Color words and any-color production add no identity: Urborg, Tomb of Yawgmoth",
+    "rule": "CR 903.4 / 903.5c",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Urborg, Tomb of Yawgmoth",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "colorless-reject-basic",
+    "description": "Colorless commander cannot include Plains",
+    "rule": "CR 903.5c / 903.5d",
+    "input": {
+      "commanders": [
+        "Kozilek, the Great Distortion"
+      ],
+      "cards": [
+        {
+          "name": "Plains",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Plains"
+        }
+      ]
+    }
+  },
+  {
+    "id": "commander-rules-identity",
+    "description": "Commander identity includes activated mana symbols",
+    "rule": "CR 903.4",
+    "input": {
+      "commanders": [
+        "Alesha, Who Smiles at Death"
+      ],
+      "cards": [
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Swamp",
+          "count": 1
+        },
+        {
+          "name": "Mountain",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 96
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "size-99",
+    "description": "Commander plus 98 cards is only 99",
+    "rule": "CR 903.5a",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "DECK_SIZE",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "size-101",
+    "description": "Commander plus 100 cards is 101",
+    "rule": "CR 903.5a",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 100
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "DECK_SIZE",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "singleton-spell",
+    "description": "Two nonbasic spells violate singleton",
+    "rule": "CR 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Sol Ring",
+          "count": 2
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "SINGLETON",
+          "card": "Sol Ring"
+        }
+      ]
+    }
+  },
+  {
+    "id": "singleton-land",
+    "description": "Nonbasic lands remain singleton",
+    "rule": "CR 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Command Tower",
+          "count": 2
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "SINGLETON",
+          "card": "Command Tower"
+        }
+      ]
+    }
+  },
+  {
+    "id": "singleton-split-rows",
+    "description": "Counts aggregate across repeated rows",
+    "rule": "CR 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Sol Ring",
+          "count": 1
+        },
+        {
+          "name": "Sol Ring",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "SINGLETON",
+          "card": "Sol Ring"
+        }
+      ]
+    }
+  },
+  {
+    "id": "singleton-commander",
+    "description": "Commander counts toward singleton",
+    "rule": "CR 903.5b",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Isamaru, Hound of Konda",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "SINGLETON",
+          "card": "Isamaru, Hound of Konda"
+        }
+      ]
+    }
+  },
+  {
+    "id": "unlimited-Relentless-Rats",
+    "description": "99 copies allowed by Relentless Rats",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Relentless Rats",
+          "count": 99
+        }
+      ],
+      "fillBasics": []
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "unlimited-Shadowborn-Apostle",
+    "description": "99 copies allowed by Shadowborn Apostle",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Shadowborn Apostle",
+          "count": 99
+        }
+      ],
+      "fillBasics": []
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "unlimited-Persistent-Petitioners",
+    "description": "99 copies allowed by Persistent Petitioners",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Persistent Petitioners",
+          "count": 99
+        }
+      ],
+      "fillBasics": []
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "unlimited-Dragon's-Approach",
+    "description": "99 copies allowed by Dragon's Approach",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Dragon's Approach",
+          "count": 99
+        }
+      ],
+      "fillBasics": []
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "limit-ok-7",
+    "description": "Seven Dwarves at explicit maximum",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Seven Dwarves",
+          "count": 7
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 92
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "limit-exceeded-7",
+    "description": "Seven Dwarves one above explicit maximum",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Seven Dwarves",
+          "count": 8
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 91
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "SINGLETON",
+          "card": "Seven Dwarves"
+        }
+      ]
+    }
+  },
+  {
+    "id": "limit-ok-9",
+    "description": "Nazg\u00fbl at explicit maximum",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Nazg\u00fbl",
+          "count": 9
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 90
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "limit-exceeded-9",
+    "description": "Nazg\u00fbl one above explicit maximum",
+    "rule": "CR 101.1 / 903.5b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Nazg\u00fbl",
+          "count": 10
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 89
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "SINGLETON",
+          "card": "Nazg\u00fbl"
+        }
+      ]
+    }
+  },
+  {
+    "id": "unlimited-still-color",
+    "description": "Copy exception does not override color identity",
+    "rule": "CR 101.1 / 903.5c",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Relentless Rats",
+          "count": 20
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 79
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Relentless Rats"
+        }
+      ]
+    }
+  },
+  {
+    "id": "partner-valid",
+    "description": "Partner commanders combine identities",
+    "rule": "CR 702.124 / 903.4",
+    "input": {
+      "commanders": [
+        "Thrasios, Triton Hero",
+        "Tymna the Weaver"
+      ],
+      "cards": [
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Island",
+          "count": 1
+        },
+        {
+          "name": "Swamp",
+          "count": 1
+        },
+        {
+          "name": "Forest",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 94
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "partner-order",
+    "description": "Partner order does not matter",
+    "rule": "CR 702.124",
+    "input": {
+      "commanders": [
+        "Tymna the Weaver",
+        "Thrasios, Triton Hero"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "partner-offcolor",
+    "description": "Partner union still excludes red",
+    "rule": "CR 702.124 / 903.5c",
+    "input": {
+      "commanders": [
+        "Thrasios, Triton Hero",
+        "Tymna the Weaver"
+      ],
+      "cards": [
+        {
+          "name": "Mountain",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Mountain"
+        }
+      ]
+    }
+  },
+  {
+    "id": "partner-size-101",
+    "description": "Two partners plus 99 is 101",
+    "rule": "CR 702.124 / 903.5a",
+    "input": {
+      "commanders": [
+        "Thrasios, Triton Hero",
+        "Tymna the Weaver"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "DECK_SIZE",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "partner-with-valid",
+    "description": "Named reciprocal Partner with pair",
+    "rule": "CR 702.124j",
+    "input": {
+      "commanders": [
+        "Brallin, Skyshark Rider",
+        "Shabraz, the Skyshark"
+      ],
+      "cards": [
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Island",
+          "count": 1
+        },
+        {
+          "name": "Mountain",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 95
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "partner-with-invalid",
+    "description": "Partner with is not generic Partner",
+    "rule": "CR 702.124j",
+    "input": {
+      "commanders": [
+        "Brallin, Skyshark Rider",
+        "Thrasios, Triton Hero"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_PAIR",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "friends-valid",
+    "description": "Friends forever pair",
+    "rule": "CR 702.124",
+    "input": {
+      "commanders": [
+        "Bjorna, Nightfall Alchemist",
+        "Wernog, Rider's Chaplain"
+      ],
+      "cards": [
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Swamp",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 96
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "friends-not-partner",
+    "description": "Friends forever cannot pair with generic Partner",
+    "rule": "CR 702.124",
+    "input": {
+      "commanders": [
+        "Bjorna, Nightfall Alchemist",
+        "Thrasios, Triton Hero"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_PAIR",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "background-valid",
+    "description": "Choose a Background adds background identity",
+    "rule": "CR 702.124k",
+    "input": {
+      "commanders": [
+        "Wilson, Refined Grizzly",
+        "Scion of Halaster"
+      ],
+      "cards": [
+        {
+          "name": "Swamp",
+          "count": 1
+        },
+        {
+          "name": "Forest",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 96
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "background-order",
+    "description": "Background may appear first in input",
+    "rule": "CR 702.124k",
+    "input": {
+      "commanders": [
+        "Scion of Halaster",
+        "Wilson, Refined Grizzly"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "background-single",
+    "description": "Enchantment Background cannot command alone",
+    "rule": "CR 702.124k",
+    "input": {
+      "commanders": [
+        "Scion of Halaster"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "INVALID_COMMANDER",
+          "card": "Scion of Halaster"
+        }
+      ]
+    }
+  },
+  {
+    "id": "background-wrong-pair",
+    "description": "Two choosers cannot replace a Background",
+    "rule": "CR 702.124k",
+    "input": {
+      "commanders": [
+        "Wilson, Refined Grizzly",
+        "Skanos Dragonheart"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_PAIR",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "background-size-99",
+    "description": "Background counts toward 100",
+    "rule": "CR 702.124k / 903.5a",
+    "input": {
+      "commanders": [
+        "Wilson, Refined Grizzly",
+        "Scion of Halaster"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "DECK_SIZE",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "doctor-valid",
+    "description": "Doctor and Doctor\u2019s companion combine identity",
+    "rule": "CR 702.124m",
+    "input": {
+      "commanders": [
+        "The Tenth Doctor",
+        "Rose Tyler"
+      ],
+      "cards": [
+        {
+          "name": "Plains",
+          "count": 1
+        },
+        {
+          "name": "Island",
+          "count": 1
+        },
+        {
+          "name": "Mountain",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 95
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "doctor-order",
+    "description": "Doctor companion pairing is symmetric",
+    "rule": "CR 702.124m",
+    "input": {
+      "commanders": [
+        "Rose Tyler",
+        "The Tenth Doctor"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "doctor-wrong-subtype",
+    "description": "Time Lord Rogue is not a Time Lord Doctor",
+    "rule": "CR 702.124m",
+    "input": {
+      "commanders": [
+        "The Master, Multiplied",
+        "Rose Tyler"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_PAIR",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "doctor-two-doctors",
+    "description": "Two Doctors lack a companion ability",
+    "rule": "CR 702.124m",
+    "input": {
+      "commanders": [
+        "The Tenth Doctor",
+        "The War Doctor"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_PAIR",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "doctor-two-companions",
+    "description": "Two Doctor\u2019s companions lack a Doctor",
+    "rule": "CR 702.124m",
+    "input": {
+      "commanders": [
+        "Rose Tyler",
+        "Martha Jones"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_PAIR",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "partner-single",
+    "description": "Partner may command alone",
+    "rule": "CR 702.124",
+    "input": {
+      "commanders": [
+        "Thrasios, Triton Hero"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "friends-single",
+    "description": "Friends forever may command alone",
+    "rule": "CR 702.124",
+    "input": {
+      "commanders": [
+        "Bjorna, Nightfall Alchemist"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "chooser-single",
+    "description": "Choose a Background is optional",
+    "rule": "CR 702.124k",
+    "input": {
+      "commanders": [
+        "Wilson, Refined Grizzly"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "doctor-companion-single",
+    "description": "Doctor\u2019s companion may command alone",
+    "rule": "CR 702.124m",
+    "input": {
+      "commanders": [
+        "Rose Tyler"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "ordinary-two",
+    "description": "Two ordinary legends cannot command together",
+    "rule": "CR 903.3",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda",
+        "Kemba, Kha Enduring"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_PAIR",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "nonlegendary",
+    "description": "Nonlegendary creature cannot command",
+    "rule": "CR 903.3",
+    "input": {
+      "commanders": [
+        "Grizzly Bears"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Forest",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "INVALID_COMMANDER",
+          "card": "Grizzly Bears"
+        }
+      ]
+    }
+  },
+  {
+    "id": "planeswalker-invalid",
+    "description": "Planeswalker without permission cannot command",
+    "rule": "CR 903.3",
+    "input": {
+      "commanders": [
+        "Jace Beleren"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Island",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "INVALID_COMMANDER",
+          "card": "Jace Beleren"
+        }
+      ]
+    }
+  },
+  {
+    "id": "planeswalker-valid",
+    "description": "Explicit can be your commander permission",
+    "rule": "CR 101.1 / 903.3",
+    "input": {
+      "commanders": [
+        "Teferi, Temporal Archmage"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Island",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "grist-valid",
+    "description": "Grist is a creature outside the battlefield",
+    "rule": "CR 113.6 / 903.3",
+    "input": {
+      "commanders": [
+        "Grist, the Hunger Tide"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "backface-not-commander",
+    "description": "Legendary creature back face does not qualify artifact front",
+    "rule": "CR 903.3 / 712",
+    "input": {
+      "commanders": [
+        "Elbrus, the Binding Blade // Withengar Unbound"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "INVALID_COMMANDER",
+          "card": "Elbrus, the Binding Blade // Withengar Unbound"
+        }
+      ]
+    }
+  },
+  {
+    "id": "no-commander",
+    "description": "One commander required",
+    "rule": "CR 903.3",
+    "input": {
+      "commanders": [],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 100
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_COUNT",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "three-commanders",
+    "description": "Partner does not allow three commanders",
+    "rule": "CR 702.124",
+    "input": {
+      "commanders": [
+        "Thrasios, Triton Hero",
+        "Tymna the Weaver",
+        "Sakashima of a Thousand Faces"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMMANDER_COUNT",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "lurrus-valid",
+    "description": "Lurrus outside 100 does not check its own mana value",
+    "rule": "CR 702.139 / 903.11",
+    "input": {
+      "commanders": [
+        "Karlov of the Ghost Council"
+      ],
+      "cards": [
+        {
+          "name": "Sol Ring",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 98
+        }
+      ],
+      "companion": "Lurrus of the Dream-Den"
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "lurrus-commander-fails",
+    "description": "Lurrus checks commander mana value",
+    "rule": "CR 702.139b",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ],
+      "companion": "Lurrus of the Dream-Den"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMPANION",
+          "card": "Lurrus of the Dream-Den"
+        }
+      ]
+    }
+  },
+  {
+    "id": "lurrus-permanent-fails",
+    "description": "A three-mana permanent fails Lurrus",
+    "rule": "CR 702.139",
+    "input": {
+      "commanders": [
+        "Karlov of the Ghost Council"
+      ],
+      "cards": [
+        {
+          "name": "Phyrexian Arena",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 98
+        }
+      ],
+      "companion": "Lurrus of the Dream-Den"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMPANION",
+          "card": "Lurrus of the Dream-Den"
+        }
+      ]
+    }
+  },
+  {
+    "id": "lurrus-instant-ok",
+    "description": "High mana value nonpermanent is allowed",
+    "rule": "CR 702.139",
+    "input": {
+      "commanders": [
+        "Karlov of the Ghost Council"
+      ],
+      "cards": [
+        {
+          "name": "Damnation",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 98
+        }
+      ],
+      "companion": "Lurrus of the Dream-Den"
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "lurrus-offcolor",
+    "description": "Companion identity must fit commanders",
+    "rule": "CR 903.11 / 702.139",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 99
+        }
+      ],
+      "companion": "Lurrus of the Dream-Den"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Lurrus of the Dream-Den"
+        }
+      ]
+    }
+  },
+  {
+    "id": "companion-not-100",
+    "description": "99 plus companion is still only 99",
+    "rule": "CR 903.5a / 702.139",
+    "input": {
+      "commanders": [
+        "Karlov of the Ghost Council"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 98
+        }
+      ],
+      "companion": "Lurrus of the Dream-Den"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "DECK_SIZE",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "lurrus-copy",
+    "description": "Companion cannot duplicate starting deck card",
+    "rule": "CR 903.11",
+    "input": {
+      "commanders": [
+        "Karlov of the Ghost Council"
+      ],
+      "cards": [
+        {
+          "name": "Lurrus of the Dream-Den",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Swamp",
+          "count": 98
+        }
+      ],
+      "companion": "Lurrus of the Dream-Den"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "SINGLETON",
+          "card": "Lurrus of the Dream-Den"
+        },
+        {
+          "type": "COMPANION",
+          "card": "Lurrus of the Dream-Den"
+        }
+      ]
+    }
+  },
+  {
+    "id": "yorion-100",
+    "description": "100-card deck cannot meet Yorion +20 requirement",
+    "rule": "CR 903.5a / 702.139",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 99
+        }
+      ],
+      "companion": "Yorion, Sky Nomad"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "COMPANION",
+          "card": "Yorion, Sky Nomad"
+        }
+      ]
+    }
+  },
+  {
+    "id": "yorion-120",
+    "description": "120 meets Yorion condition but violates Commander size",
+    "rule": "CR 903.5a / 702.139",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 119
+        }
+      ],
+      "companion": "Yorion, Sky Nomad"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "DECK_SIZE",
+          "card": null
+        }
+      ]
+    }
+  },
+  {
+    "id": "yorion-in-deck",
+    "description": "Yorion in the deck imposes no companion condition",
+    "rule": "CR 702.139",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Yorion, Sky Nomad",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Wastes",
+          "count": 98
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "multiple-errors",
+    "description": "Collect independent ban color and singleton errors",
+    "rule": "CR 100.6 / 903.5b / 903.5c",
+    "input": {
+      "commanders": [
+        "Isamaru, Hound of Konda"
+      ],
+      "cards": [
+        {
+          "name": "Dockside Extortionist",
+          "count": 2
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Dockside Extortionist"
+        },
+        {
+          "type": "COLOR_IDENTITY",
+          "card": "Dockside Extortionist"
+        },
+        {
+          "type": "SINGLETON",
+          "card": "Dockside Extortionist"
+        }
+      ]
+    }
+  },
+  {
+    "id": "lutri-commander-legal",
+    "description": "Lutri as commander (unbanned Feb 9 2026)",
+    "rule": "Commander B&R Feb 9 2026",
+    "input": {
+      "commanders": [
+        "Lutri, the Spellchaser"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Island",
+          "count": 99
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  },
+  {
+    "id": "lutri-companion-banned",
+    "description": "Lutri is banned as a companion",
+    "rule": "Commander B&R Feb 9 2026",
+    "input": {
+      "commanders": [
+        "Niv-Mizzet, Parun"
+      ],
+      "cards": [],
+      "fillBasics": [
+        {
+          "name": "Island",
+          "count": 99
+        }
+      ],
+      "companion": "Lutri, the Spellchaser"
+    },
+    "expected": {
+      "legal": false,
+      "errors": [
+        {
+          "type": "BANNED",
+          "card": "Lutri, the Spellchaser"
+        },
+        {
+          "type": "COMPANION",
+          "card": "Lutri, the Spellchaser"
+        }
+      ]
+    }
+  },
+  {
+    "id": "coalition-victory-legal",
+    "description": "Coalition Victory unbanned Apr 22 2025",
+    "rule": "Commander B&R Apr 22 2025",
+    "input": {
+      "commanders": [
+        "Kenrith, the Returned King"
+      ],
+      "cards": [
+        {
+          "name": "Coalition Victory",
+          "count": 1
+        },
+        {
+          "name": "Braids, Cabal Minion",
+          "count": 1
+        }
+      ],
+      "fillBasics": [
+        {
+          "name": "Plains",
+          "count": 97
+        }
+      ]
+    },
+    "expected": {
+      "legal": true,
+      "errors": []
+    }
+  }
+]
