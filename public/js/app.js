@@ -1,7 +1,7 @@
 // Card Binder app: Scan / Binder / Value.
 import { loadDB, db, img, priceOf, defaultFinish, isOldFrame } from './carddb.js';
 import { Binder } from './binder.js';
-import { exportCSV, exportMoxfield, importManaBox } from './csv.js';
+import { exportCSV, exportMoxfield, importManaBox, exportGoldfish, exportArchidekt, exportDeckbox, exportManaBoxCSV, exportTCGplayer, exportText } from './csv.js';
 import { collection } from './scry.js';
 import { kvGet, kvSet } from './db.js';
 import { norm } from './match.js';
@@ -14,7 +14,7 @@ const S = { tab: 'scan', mode: 'single', auto: false, foil: false, view: 'list',
 
 // ---------- tabs
 function show(tab) {
-  S.tab = tab; $$('.view').forEach(v => v.classList.toggle('active', v.id === 'v-' + tab)); $$('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  S.tab = tab; document.body.dataset.tab = tab; $$('.view').forEach(v => v.classList.toggle('active', v.id === 'v-' + tab)); $$('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
   if (tab === 'binder') renderBinder(); if (tab === 'value') renderValue();
 }
 $$('.tabs button').forEach(b => b.onclick = () => show(b.dataset.tab));
@@ -29,9 +29,20 @@ function toast(msg, undo) {
 async function undoLast() { const l = await binder.undo(); if (l) toast('Undid: ' + l); syncTrayWithBinder(); }
 
 // ---------- sheet
-function openSheet(html, bind) { $('#sheet-body').innerHTML = html; $('#sheet').hidden = false; bind && bind($('#sheet-body')); }
-function closeSheet() { $('#sheet').hidden = true; $('#sheet-body').innerHTML = ''; }
-$('.sheet-bg').onclick = closeSheet;
+// sheets close with ✕, the dark backdrop, or the phone's Back button
+let sheetOpen = false, sheetOnClose = null;
+function openSheet(html, bind, onClose = null) {
+  if (sheetOnClose && sheetOnClose !== onClose) { const f = sheetOnClose; sheetOnClose = null; f(); }
+  sheetOnClose = onClose; $('#sheet-body').innerHTML = html; $('#sheet').hidden = false; $('#sheet-body').scrollTop = 0;
+  if (!sheetOpen) { sheetOpen = true; history.pushState({ sheet: 1 }, ''); }
+  bind && bind($('#sheet-body'));
+}
+function closeSheet(fromBack = false) {
+  $('#sheet').hidden = true; $('#sheet-body').innerHTML = ''; const f = sheetOnClose; sheetOnClose = null; f && f();
+  if (sheetOpen) { sheetOpen = false; if (!fromBack) history.back(); }
+}
+$('.sheet-bg').onclick = () => closeSheet(); $('#sheet-x').onclick = () => closeSheet();
+addEventListener('popstate', () => { if (sheetOpen) closeSheet(true); });
 
 // ---------- scanner engine (lazy)
 let enginePromise;
@@ -59,7 +70,7 @@ async function startCam() {
     const tr = st.getVideoTracks()[0]; const caps = tr.getCapabilities?.() || {};
     if (caps.torch) $('#tg-torch').hidden = false;
     if (caps.focusMode?.includes('continuous')) tr.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }).catch(() => {});
-    requestAnimationFrame(drawOverlay); liveLoop();
+    LIVE.camAt = performance.now(); LIVE.lockAt = LIVE.firstAt = 0; initLiveWorker(); requestAnimationFrame(drawOverlay); liveLoop();
   } catch (e) { $('#cam-msg').innerHTML = 'Camera blocked. Allow camera access for this site, or use <b>Photo</b>.'; }
 }
 $('#btn-startcam').onclick = startCam;
@@ -91,26 +102,52 @@ function drawOverlay() {
   requestAnimationFrame(drawOverlay);
 }
 // lightweight live detection for the outline + auto mode
+// Live outline runs in a Web Worker (its own OpenCV) on a small 480px frame, so the screen and the card reader stay smooth.
+// The full-resolution frame is only grabbed when a card is actually read.
 const small = document.createElement('canvas');
+const LIVE = { w: null, ready: false, busy: false, id: 0, last: 0, camAt: 0, lockAt: 0, firstAt: 0, ms: [] };
+window.__live = LIVE; LIVE.reset = () => { stableN = 0; lastCenter = null; liveQuads = []; LIVE.lockAt = LIVE.firstAt = 0; LIVE.camAt = performance.now(); };
+function initLiveWorker() {
+  if (LIVE.w || !window.Worker || !window.OffscreenCanvas || !window.createImageBitmap) return;
+  try {
+    LIVE.w = new Worker(new URL('./liveworker.js', import.meta.url));
+    LIVE.w.onmessage = e => { const m = e.data; if (m.ready) { LIVE.ready = true; return; } if (m.error) { LIVE.w.terminate(); LIVE.w = null; return; } if (m.quads) { LIVE.busy = false; if (m.ms) { LIVE.ms.push(m.ms); if (LIVE.ms.length > 50) LIVE.ms.shift(); } onLive(m.quads, m.sc ?? LIVE.sc); } };
+    LIVE.w.onerror = () => { LIVE.w = null; LIVE.ready = false; LIVE.busy = false; };
+    LIVE.w.postMessage({ init: true, base: new URL('../', import.meta.url).href });
+  } catch { LIVE.w = null; }
+}
+const liveN = () => S.mode === 'grid3' ? 9 : S.mode === 'grid2' ? 4 : 1;
+function onLive(qs, sc) {
+  if (!S.stream) return;
+  liveQuads = qs.map(q => q.map(p => [p[0] / sc, p[1] / sc]));
+  if (liveQuads.length && !LIVE.firstAt) LIVE.firstAt = performance.now();
+  if (liveN() === 1 && liveQuads.length) {
+    const c = liveQuads[0].reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4], [0, 0]);
+    const moved = lastCenter ? Math.hypot(c[0] - lastCenter[0], c[1] - lastCenter[1]) / video.videoWidth : 1;
+    stableN = moved < 0.025 ? stableN + 1 : 0; lastCenter = c;
+    if (stableN >= 1 && !LIVE.lockAt) LIVE.lockAt = performance.now();
+    if (S.auto && stableN >= 1 && sawEmpty && !S.busy) { stableN = 0; capture({ auto: true }); }
+  } else { stableN = 0; lastCenter = null; if (!liveQuads.length) sawEmpty = true; }
+}
 async function liveLoop() {
   if (!S.stream) return;
-  if (S.idf && !S.busy && !S.rec && S.tab === 'scan' && video.videoWidth) {
-    const sc = 640 / Math.max(video.videoWidth, video.videoHeight); small.width = video.videoWidth * sc | 0; small.height = video.videoHeight * sc | 0;
-    const g = small.getContext('2d', { willReadFrequently: true }); g.drawImage(video, 0, 0, small.width, small.height);
-    const { detectCards } = await import('./vision.js'); const cv = S.idf.cv;
-    const src = cv.matFromImageData(g.getImageData(0, 0, small.width, small.height));
-    const n = S.mode === 'grid3' ? 9 : S.mode === 'grid2' ? 4 : 1;
-    let qs = []; try { qs = detectCards(cv, src, { maxCards: n, minAreaFrac: n === 9 ? 0.012 : n === 4 ? 0.03 : 0.08 }); } catch { }
-    src.delete();
-    liveQuads = qs.map(q => q.map(p => [p[0] / sc, p[1] / sc]));
-    if (n === 1 && liveQuads.length) {
-      const c = liveQuads[0].reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4], [0, 0]);
-      const moved = lastCenter ? Math.hypot(c[0] - lastCenter[0], c[1] - lastCenter[1]) / video.videoWidth : 1;
-      stableN = moved < 0.02 ? stableN + 1 : 0; lastCenter = c;
-      if (S.auto && stableN >= 1 && sawEmpty) { stableN = 0; capture({ auto: true }); }
-    } else { stableN = 0; lastCenter = null; if (!liveQuads.length) sawEmpty = true; }
+  const gap = S.rec ? 500 : JOB.state === 'running' ? 250 : 70; // gentle while a video is being read
+  if (!S.busy && !S.rec && S.tab === 'scan' && video.videoWidth && performance.now() - LIVE.last > gap) {
+    const n = liveN(); const sz = n === 1 ? 480 : 640; const sc = sz / Math.max(video.videoWidth, video.videoHeight);
+    const w = video.videoWidth * sc | 0, h = video.videoHeight * sc | 0;
+    if (LIVE.ready && !LIVE.busy) {
+      LIVE.busy = true; LIVE.last = performance.now(); LIVE.sc = sc;
+      try { const bmp = await createImageBitmap(video, { resizeWidth: w, resizeHeight: h, resizeQuality: 'low' }); LIVE.w.postMessage({ bmp, n, id: ++LIVE.id, sc }, [bmp]); } catch { LIVE.busy = false; }
+      setTimeout(() => { if (LIVE.busy && performance.now() - LIVE.last > 3000) LIVE.busy = false; }, 3100);
+    } else if (!LIVE.ready && S.idf) { // fallback: main thread (until the worker is up, or if it can't run)
+      LIVE.last = performance.now(); small.width = w; small.height = h;
+      const g = small.getContext('2d', { willReadFrequently: true }); g.drawImage(video, 0, 0, w, h);
+      const { detectLive } = await import('./vision.js'); const cv = S.idf.cv;
+      const src = cv.matFromImageData(g.getImageData(0, 0, w, h)); let qs = []; try { qs = detectLive(cv, src, { n }); } catch { } src.delete();
+      onLive(qs, sc);
+    }
   }
-  setTimeout(liveLoop, S.rec ? 600 : S.auto ? 150 : 350);
+  setTimeout(liveLoop, 30);
 }
 
 // ---------- capture & identify
@@ -132,6 +169,7 @@ async function capture({ auto = false, imageEl = null } = {}) {
       if (top.match.name === lastAutoName && Date.now() - lastAutoT < 2500) { status('Same card — move it away to scan the next'); return; }
       lastAutoName = top.match.name; lastAutoT = Date.now();
     }
+    if (S.price) { status(found.length ? `Read in ${(r.ms / 1000).toFixed(1)}s` : 'No card found — fill the box and avoid glare'); if (navigator.vibrate && found.length) navigator.vibrate(30); showPrice(found); return; }
     status(found.length ? `${found.length} card${found.length > 1 ? 's' : ''} in ${(r.ms / 1000).toFixed(1)}s` : 'No card found — fill the box and avoid glare');
     if (navigator.vibrate && found.length) navigator.vibrate(30);
     await addScanResults(r.results);
@@ -300,8 +338,27 @@ $('#btn-refresh').onclick = async () => {
 };
 function download(name, text, type = 'text/csv') { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
 const stamp = () => new Date().toISOString().slice(0, 10);
-$('#btn-csv').onclick = () => download(`card-binder-${stamp()}.csv`, exportCSV(filteredAll()));
-$('#btn-mox').onclick = () => download(`moxfield-${stamp()}.csv`, exportMoxfield(filteredAll()));
+const EXPORTS = [
+  ['moxfield', 'Moxfield', 'CSV', () => exportMoxfield(filteredAll())],
+  ['archidekt', 'Archidekt', 'CSV', () => exportArchidekt(filteredAll())],
+  ['goldfish', 'MTGGoldfish', 'CSV', () => exportGoldfish(filteredAll())],
+  ['deckbox', 'Deckbox', 'CSV', () => exportDeckbox(filteredAll())],
+  ['manabox', 'ManaBox', 'CSV', () => exportManaBoxCSV(filteredAll())],
+  ['tcgplayer', 'TCGplayer Mass Entry', 'text · pick foil on TCGplayer', () => exportTCGplayer(filteredAll())],
+  ['decklist', 'Plain text list', 'text', () => exportText(filteredAll())],
+  ['card-binder', 'Spreadsheet (with prices)', 'CSV', () => exportCSV(filteredAll())],
+];
+$('#btn-export').onclick = () => {
+  if (!binder.entries().length) return toast('No cards yet');
+  openSheet(`<h2>Export your binder</h2><div class="sub small">Every format includes set code, collector number, foil and quantity. Text formats are also copied so you can paste them.</div>
+    <div class="exp">${EXPORTS.map(([k, n, t]) => `<button class="btn" data-k="${k}">${n} <small>${t}</small></button>`).join('')}</div>`, root => {
+    root.querySelectorAll('.exp button').forEach(b => b.onclick = async () => {
+      const [k, n, t, fn] = EXPORTS.find(x => x[0] === b.dataset.k); const text = fn();
+      if (t.startsWith('text')) { let copied = false; try { await navigator.clipboard.writeText(text); copied = true; } catch { } download(`${k}-${stamp()}.txt`, text, 'text/plain'); toast(copied ? `Copied ${n} list — paste it in, or use the saved file` : `Saved ${n} file`); }
+      else { download(`${k}-${stamp()}.csv`, text); toast(`Saved ${n} CSV`); }
+    });
+  });
+};
 const filteredAll = () => binder.entries().sort((a, b) => a.name.localeCompare(b.name));
 $('#imp').onchange = async e => {
   const f = e.target.files[0]; if (!f) return; await loadDB();
@@ -322,11 +379,12 @@ binder.on(() => { if (S.tab === 'binder') renderBinder(); if (S.tab === 'value')
   status('Loading cards…');
   const mode = await kvGet('mode'); if (mode) $(`#mode-seg [data-mode="${mode}"]`)?.click();
   await Promise.all([loadDB(), binder.load()]);
+  loadJob().catch(() => {}); if (await kvGet('priceMode')) setPrice(true);
   engine().catch(() => {});
   if (await kvGet('camOK')) startCam();
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
-window.__app = { S, binder, capture, show };
+window.__app = { S, binder, capture, show }; document.body.dataset.tab = 'scan';
 
 // ---------- Record mode: film a sweep over cards / binder pages, then review everything at once
 let recorder = null, recChunks = [];
@@ -343,44 +401,118 @@ async function startRec() {
 }
 function stopRec() { if (recorder && recorder.state !== 'inactive') recorder.stop(); setRecUI(false); }
 $('#vid-in').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (f) runRecord(f); };
+// A video is read in the background: close the sheet any time, a pill shows progress and reopens the results.
+// Results are saved on the phone (IndexedDB) until you add or discard them.
+const JOB = { state: 'idle', pct: 0, msg: '', ac: null, items: [] };
+function pill() {
+  const el = $('#job-pill');
+  if (JOB.state === 'running') { el.hidden = false; el.className = 'job-pill run'; el.textContent = `Reading video… ${Math.round(JOB.pct * 100)}%`; }
+  else if (JOB.state === 'done' && JOB.items.length) { el.hidden = false; el.className = 'job-pill'; el.textContent = `${JOB.items.length} card${JOB.items.length === 1 ? '' : 's'} to review ›`; }
+  else el.hidden = true;
+}
+$('#job-pill').onclick = () => openJob();
+const saveJob = () => kvSet('videoJob', JOB.state === 'done' && JOB.items.length ? { at: Date.now(), items: JOB.items.map(i => ({ ...i, print: i.print.id, alts: i.alts.slice(0, 20).map(a => a.id) })) } : null);
+async function loadJob() {
+  const j = await kvGet('videoJob'); if (!j?.items?.length) return;
+  JOB.items = j.items.map(i => ({ ...i, print: db().byId.get(i.print), alts: (i.alts || []).map(id => db().byId.get(id)).filter(Boolean) })).filter(i => i.print);
+  if (JOB.items.length) { JOB.state = 'done'; pill(); }
+}
+function openJob() {
+  if (JOB.state === 'running') {
+    openSheet(`<h3>Reading your video…</h3><div class="sub small">You can close this — it keeps going. Tap the blue pill to come back.</div><div class="prog"><i id="rp" style="width:${JOB.pct * 100}%"></i></div><div id="rs" class="sub small">${esc(JOB.msg)}</div>
+      <div class="btn-row"><button class="btn" id="rh">Keep going in background</button><button class="btn ghost danger" id="rc">Cancel</button></div>`, root => {
+      root.querySelector('#rh').onclick = () => closeSheet();
+      root.querySelector('#rc').onclick = () => { JOB.ac?.abort(); closeSheet(); };
+    });
+  } else if (JOB.state === 'done') showReview();
+}
 async function runRecord(blob) {
-  const ac = new AbortController(); S.busy = true;
-  openSheet(`<h3>Reading your video…</h3><div class="prog"><i id="rp"></i></div><div id="rs" class="sub small">Starting…</div><button class="btn ghost" id="rc">Cancel</button>`, root => root.querySelector('#rc').onclick = () => { ac.abort(); closeSheet(); });
+  if (JOB.state === 'running') return toast('Already reading a video — tap the pill');
+  if (JOB.state === 'done' && JOB.items.length && !confirm(`You still have ${JOB.items.length} cards to review from the last video. Replace them?`)) return;
+  const ac = new AbortController(); Object.assign(JOB, { state: 'running', pct: 0, msg: 'Starting…', ac, items: [] }); pill(); openJob();
   try {
     const idf = await engine(); const { processVideo } = await import('./record.js');
-    const r = await processVideo(idf, blob, { signal: ac.signal, onProgress: (f, msg) => { const p = $('#rp'), m = $('#rs'); if (p) p.style.width = (f * 100).toFixed(0) + '%'; if (m) m.textContent = msg; } });
-    status(`Video: ${r.cards.length} cards in ${(r.ms / 1000).toFixed(0)}s`);
-    showReview(r.cards);
-  } catch (e) { if (!ac.signal.aborted) { console.error(e); openSheet(`<h3>Couldn’t read that video</h3><p class="sub">${esc(e.message)}</p>`); } }
-  finally { S.busy = false; }
+    const r = await processVideo(idf, blob, { signal: ac.signal, onProgress: (f, msg) => { JOB.pct = f; JOB.msg = msg; pill(); const p = $('#rp'), m = $('#rs'); if (p) p.style.width = (f * 100).toFixed(0) + '%'; if (m) m.textContent = msg; } });
+    JOB.items = r.cards.map(c => ({ id: Math.random().toString(36).slice(2), print: c.match, alts: c.alts || [], conf: c.conf, finish: chooseFinish(c.match), qty: 1, on: c.conf !== 'low', thumb: c.cardCanvas ? c.cardCanvas.toDataURL('image/jpeg', 0.5) : '' }));
+    JOB.state = 'done'; await saveJob(); pill();
+    if (navigator.vibrate) navigator.vibrate([40, 60, 40]);
+    if (!JOB.items.length) { JOB.state = 'idle'; pill(); openSheet('<h3>No cards found</h3><p class="sub">Hold each card or page still for about a second, fill most of the screen, and avoid glare.</p>'); }
+    else if (sheetOpen && $('#rp')) showReview(); else toast(`Video done: ${JOB.items.length} cards to review`, null);
+  } catch (e) {
+    const cancelled = ac.signal.aborted; Object.assign(JOB, { state: 'idle', items: [] }); pill();
+    if (cancelled) toast('Video cancelled'); else { console.error(e); openSheet(`<h3>Couldn’t read that video</h3><p class="sub">${esc(e.message)}</p>`); }
+  }
 }
-function showReview(cards) {
-  const items = cards.map(c => ({ id: Math.random().toString(36).slice(2), print: c.match, alts: c.alts || [], conf: c.conf, ocr: c.ocr, finish: chooseFinish(c.match), qty: 1, on: c.conf !== 'low', thumb: c.cardCanvas ? c.cardCanvas.toDataURL('image/jpeg', 0.6) : '' }));
-  if (!items.length) return openSheet('<h3>No cards found</h3><p class="sub">Hold each card or page still for about a second, fill most of the screen, and avoid glare.</p>');
+function showReview() {
+  const items = JOB.items;
   const draw = root => {
     const on = items.filter(i => i.on); const val = on.reduce((s, i) => s + (priceOf(i.print, i.finish) || 0) * i.qty, 0);
-    root.innerHTML = `<h3>${items.length} cards found</h3><div class="sub small">Red = not sure (unchecked). Tap a card to change it.</div>
-      <div class="rv">${items.map(i => `<div class="rv-it ${i.conf}" data-id="${i.id}"><input type="checkbox" ${i.on ? 'checked' : ''}><img src="${img(i.print, 'small')}" alt="" loading="lazy">
-      <div><b>${esc(i.print.name.split(' // ')[0])}</b><div class="sub small">${esc(i.print.set.toUpperCase())} #${esc(i.print.cn)}${isOldFrame(i.print) ? ' · old' : ''} · ${money(priceOf(i.print, i.finish))}</div></div>
-      <div class="q"><button data-d="-1">−</button><span>${i.qty}</span><button data-d="1">+</button></div></div>`).join('')}</div>
-      <button class="btn big primary" id="rv-add" ${on.length ? '' : 'disabled'}>Add ${on.reduce((s, i) => s + i.qty, 0)} to binder · ${money(val)}</button>`;
+    root.innerHTML = `<h3>${items.length} cards found</h3><div class="sub small">Red = not sure (unchecked). Tap a card to fix it. Saved until you add or discard.</div>
+      <div class="rv">${items.map(i => `<div class="rv-it ${i.conf}" data-id="${i.id}"><input type="checkbox" ${i.on ? 'checked' : ''} aria-label="Include"><img src="${img(i.print, 'small')}" alt="" loading="lazy">
+      <div class="nmc"><b>${esc(i.print.name.split(' // ')[0])}</b><div class="sub small">${esc(i.print.set.toUpperCase())} #${esc(i.print.cn)}${isOldFrame(i.print) ? ' · old' : ''}${i.finish !== 'nonfoil' ? ' · ' + i.finish : ''} · ${money(priceOf(i.print, i.finish))}</div></div>
+      <div class="q"><button data-d="-1" aria-label="Fewer">−</button><span>${i.qty}</span><button data-d="1" aria-label="More">+</button></div></div>`).join('')}</div>
+      <button class="btn big primary" id="rv-add" ${on.length ? '' : 'disabled'}>Add ${on.reduce((s, i) => s + i.qty, 0)} to binder · ${money(val)}</button>
+      <button class="btn ghost danger" id="rv-discard" style="width:100%;margin-top:8px">Discard this video’s results</button>`;
     root.querySelectorAll('.rv-it').forEach(el => { const it = items.find(x => x.id === el.dataset.id);
-      el.querySelector('input').onchange = e => { it.on = e.target.checked; draw(root); };
-      el.querySelectorAll('.q button').forEach(b => b.onclick = e => { e.stopPropagation(); it.qty = Math.max(1, it.qty + +b.dataset.d); draw(root); });
-      el.querySelector('img').onclick = el.querySelector('b').onclick = () => pickReview(it, () => openSheet('', draw)); });
+      el.querySelector('input').onchange = e => { it.on = e.target.checked; saveJob(); draw(root); };
+      el.querySelectorAll('.q button').forEach(b => b.onclick = e => { e.stopPropagation(); it.qty = Math.max(1, it.qty + +b.dataset.d); saveJob(); draw(root); });
+      el.querySelector('img').onclick = el.querySelector('.nmc').onclick = () => pickReview(it, () => openSheet('', draw)); });
     root.querySelector('#rv-add').onclick = async () => {
       const add = items.filter(i => i.on); await binder.add(add.map(i => ({ print: i.print, finish: i.finish, qty: i.qty })), `Video (${add.length})`);
-      S.tray = [...add.map(i => ({ ...i, added: true })), ...S.tray].slice(0, 60); renderTray(); closeSheet();
+      S.tray = [...add.map(i => ({ ...i, added: true })), ...S.tray].slice(0, 60); renderTray();
+      Object.assign(JOB, { state: 'idle', items: [] }); saveJob(); pill(); closeSheet();
       toast(`Added ${add.reduce((s, i) => s + i.qty, 0)} cards`, undoLast);
     };
+    root.querySelector('#rv-discard').onclick = () => { if (!confirm('Discard these results?')) return; Object.assign(JOB, { state: 'idle', items: [] }); saveJob(); pill(); closeSheet(); };
   };
   openSheet('', draw);
 }
 function pickReview(it, back) {
   const prints = printsFor(it.print.name, it.alts.map(a => a.id));
-  openSheet(`<h3>${esc(it.print.name)}</h3><input class="field" id="rn" placeholder="Wrong card? Type the name" autocomplete="off"><div id="rnl"></div>${printGrid(prints, it.print.id)}<button class="btn ghost" id="rb">Back</button>`, root => {
-    root.querySelectorAll('.pr').forEach(b => b.onclick = () => { it.print = db().byId.get(b.dataset.id); it.finish = chooseFinish(it.print); it.on = true; it.conf = 'high'; back(); });
+  const fins = (it.print.fin || 'n').split('').map(c => ({ n: 'nonfoil', f: 'foil', e: 'etched' }[c]));
+  openSheet(`<h3>${esc(it.print.name)}</h3><div class="seg small" id="rf">${fins.map(f => `<button data-f="${f}" class="${f === it.finish ? 'on' : ''}">${f === 'nonfoil' ? 'Normal' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div>
+    <input class="field" id="rn" placeholder="Wrong card? Type the name" autocomplete="off" style="margin-top:8px"><div id="rnl" class="sugg"></div>${printGrid(prints, it.print.id)}<button class="btn ghost" id="rb" style="width:100%;margin-top:8px">‹ Back to list</button>`, root => {
+    root.querySelectorAll('#rf button').forEach(b => b.onclick = () => { it.finish = b.dataset.f; saveJob(); back(); });
+    root.querySelectorAll('.pr').forEach(b => b.onclick = () => { it.print = db().byId.get(b.dataset.id); if (!it.print.fin.includes(it.finish[0])) it.finish = chooseFinish(it.print); it.on = true; it.conf = 'high'; saveJob(); back(); });
     root.querySelector('#rb').onclick = back;
-    root.querySelector('#rn').oninput = e => { root.querySelector('#rnl').innerHTML = nameSearch(e.target.value).map(n => `<button class="btn ghost small" data-n="${esc(n)}">${esc(n)}</button>`).join(''); root.querySelectorAll('#rnl button').forEach(b => b.onclick = () => { const p = printsFor(b.dataset.n)[0]; it.print = p; it.alts = []; it.finish = chooseFinish(p); it.on = true; pickReview(it, back); }); };
+    root.querySelector('#rn').oninput = e => { root.querySelector('#rnl').innerHTML = nameSearch(e.target.value).map(n => `<button class="btn ghost small" data-n="${esc(n)}">${esc(n)}</button>`).join(''); root.querySelectorAll('#rnl button').forEach(b => b.onclick = () => { const p = printsFor(b.dataset.n)[0]; it.print = p; it.alts = []; it.finish = chooseFinish(p); it.on = true; it.conf = 'high'; saveJob(); pickReview(it, back); }); };
   });
+}
+
+// ---------- Price check: scan and just see the price (nothing is added)
+function setPrice(on) { S.price = on; $('#tg-price').setAttribute('aria-pressed', on); kvSet('priceMode', on); if (!on) $('#pcard').hidden = true; status(on ? 'Price check: scan a card to see its price' : 'Ready'); }
+$('#tg-price').onclick = () => setPrice(!S.price);
+const livePrices = new Map();
+async function freshPrices(p) { // live Scryfall price (TCGplayer market, USD); falls back to the built-in prices
+  if (livePrices.has(p.id)) return livePrices.get(p.id);
+  const pr = fetch('https://api.scryfall.com/cards/' + p.id).then(r => r.ok ? r.json() : null).then(c => c && c.prices ? { usd: num(c.prices.usd), usd_foil: num(c.prices.usd_foil), usd_etched: num(c.prices.usd_etched), live: true } : null).catch(() => null);
+  livePrices.set(p.id, pr); return pr;
+}
+const num = v => v == null ? null : +v;
+function priceLine(p, pr) {
+  const x = pr || p; const fins = (p.fin || 'n').split('');
+  const parts = []; if (fins.includes('n')) parts.push(['Normal', x.usd, 'nonfoil']); if (fins.includes('f')) parts.push(['Foil', x.usd_foil, 'foil']); if (fins.includes('e')) parts.push(['Etched', x.usd_etched, 'etched']);
+  const want = chooseFinish(p);
+  return parts.map(([l, v, f]) => `<span class="${f === want ? 'on' : ''}">${money(v)} <small>${l}</small></span>`).join(' &nbsp;');
+}
+function showPrice(found) {
+  const el = $('#pcard');
+  if (!found.length) { el.hidden = true; return; }
+  if (found.length === 1) {
+    const r = found[0]; let p = r.match;
+    const draw = pr => { el.innerHTML = `<img src="${img(p, 'small')}" alt=""><div><div class="nm">${esc(p.name.split(' // ')[0])}</div><div class="sub small">${esc(p.set.toUpperCase())} #${esc(p.cn)} · ${esc(p.set_name)}${isOldFrame(p) ? ' · old' : ''}</div><div class="pr2">${priceLine(p, pr)}</div><div class="sub small">${pr?.live ? 'Live TCGplayer price via Scryfall' : 'Saved price · updating…'}${r.conf === 'low' ? ' · not sure it’s this card' : ''}</div></div>
+      <div class="acts"><button class="btn small" id="pc-add">Add</button><button class="btn small ghost" id="pc-other">Other</button><button class="btn small ghost" id="pc-x">✕</button></div>`;
+      el.querySelector('#pc-x').onclick = () => el.hidden = true;
+      el.querySelector('#pc-add').onclick = async () => { const f = chooseFinish(p); await binder.add([{ print: p, finish: f }], 'Added ' + p.name); toast(`Added ${p.name}`, undoLast); el.hidden = true; };
+      el.querySelector('#pc-other').onclick = () => openSheet(`<h2>${esc(p.name)}</h2><div class="sub small">Pick the printing you have:</div>${printGrid(printsFor(p.name, (r.alts || []).map(a => a.id)), p.id)}`, root => root.querySelectorAll('.pr').forEach(b => b.onclick = async () => { p = db().byId.get(b.dataset.id); closeSheet(); draw(null); draw(await freshPrices(p)); }));
+    };
+    draw(null); el.hidden = false; freshPrices(p).then(pr => { if (pr && found[0].match === r.match) draw(pr); });
+  } else {
+    const draw = prs => { let tot = 0; const rows = found.map((r, i) => { const p = r.match, x = prs[i] || p, f = chooseFinish(p); const v = f === 'foil' ? x.usd_foil : f === 'etched' ? x.usd_etched : (x.usd ?? x.usd_foil); tot += v || 0; return `<div class="mrow"><span>${esc(p.name.split(' // ')[0])} <span class="sub small">${esc(p.set.toUpperCase())}</span></span><b>${money(v)}</b></div>`; }).join('');
+      el.innerHTML = `<div class="multi">${rows}<div class="mrow"><b>Total (${found.length})</b><b>${money(tot)}</b></div></div><div class="acts" style="grid-column:1/-1;flex-direction:row"><button class="btn small" id="pc-add">Add all</button><button class="btn small ghost" id="pc-x">✕</button></div>`;
+      el.querySelector('#pc-x').onclick = () => el.hidden = true;
+      el.querySelector('#pc-add').onclick = async () => { await binder.add(found.map(r => ({ print: r.match, finish: chooseFinish(r.match) })), `Added ${found.length}`); toast(`Added ${found.length} cards`, undoLast); el.hidden = true; };
+    };
+    draw([]); el.hidden = false; Promise.all(found.map(r => freshPrices(r.match))).then(draw);
+  }
 }

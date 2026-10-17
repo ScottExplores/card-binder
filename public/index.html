@@ -30,10 +30,12 @@
         <button id="tg-auto" class="chip" aria-pressed="false" title="Scan automatically when a card is steady">Auto</button>
         <button id="tg-foil" class="chip" aria-pressed="false">Foil</button>
         <button id="tg-torch" class="chip" aria-pressed="false" hidden>Light</button>
-        <button id="tg-rec" class="chip rec" aria-pressed="false" title="Record a video sweeping over your cards, then review them all at once">● Record</button>
+        <button id="tg-price" class="chip" aria-pressed="false" title="Just show the price, don't add to the binder">$ Price</button>
+        <button id="tg-rec" class="chip rec" aria-pressed="false" title="Record a video sweeping over your cards, then review them all at once">● Rec</button>
       </div>
     </div>
     <div class="scan-bottom">
+      <div id="pcard" class="pcard" hidden></div>
       <div id="tray" class="tray"></div>
       <div class="shutter-row">
         <div class="lefty"><label class="btn ghost small" title="Scan a photo from your gallery">Photo<input id="file-in" type="file" accept="image/*" hidden></label><label class="btn ghost small" title="Process a video of your cards">Video<input id="vid-in" type="file" accept="video/*" hidden></label></div>
@@ -73,9 +75,8 @@
     </div>
     <div class="value-actions">
       <button id="btn-refresh" class="btn big">Refresh prices</button>
-      <button id="btn-csv" class="btn big">Export CSV</button>
-      <button id="btn-mox" class="btn big">Export for Moxfield</button>
-      <label class="btn big">Import ManaBox CSV<input id="imp" type="file" accept=".csv,text/csv" hidden></label>
+      <button id="btn-export" class="btn big">Export…</button>
+      <label class="btn big">Import CSV<input id="imp" type="file" accept=".csv,text/csv" hidden></label>
       <button id="btn-sync" class="btn big ghost">Backup / restore</button>
     </div>
     <h3 class="h">Most valuable</h3>
@@ -89,7 +90,8 @@
   </nav>
 </div>
 
-<div id="sheet" class="sheet" hidden><div class="sheet-bg"></div><div class="sheet-body" id="sheet-body"></div></div>
+<div id="sheet" class="sheet" hidden><div class="sheet-bg"></div><div class="sheet-wrap"><button class="sheet-x" id="sheet-x" aria-label="Close">✕</button><div class="sheet-body" id="sheet-body"></div></div></div>
+<button id="job-pill" class="job-pill" hidden></button>
 <div id="toast" class="toast" hidden></div>
 <script src="vendor/tess/tesseract.min.js" defer></script>
 <script type="module" src="js/app.js"></script>

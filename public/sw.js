@@ -1,6 +1,6 @@
 // Offline cache: app shell + scanner engine + card DB (cache-first), Scryfall images (stale-while-revalidate, capped).
 const V = 'cb-v1';
-const SHELL = ['./', 'index.html', 'css/app.css', 'manifest.webmanifest', 'js/app.js', 'js/binder.js', 'js/carddb.js', 'js/csv.js', 'js/db.js', 'js/identify.js', 'js/loadcv.js', 'js/match.js', 'js/scry.js', 'js/vision.js', 'js/artindex.js', 'data/art.bin', 'js/printindex.js', 'js/record.js', 'data/prints.bin',
+const SHELL = ['./', 'index.html', 'css/app.css', 'manifest.webmanifest', 'js/app.js', 'js/binder.js', 'js/carddb.js', 'js/csv.js', 'js/db.js', 'js/identify.js', 'js/loadcv.js', 'js/match.js', 'js/scry.js', 'js/vision.js', 'js/artindex.js', 'data/art.bin', 'js/printindex.js', 'js/record.js', 'js/liveworker.js', 'data/prints.bin',
   'vendor/opencv.js', 'vendor/tess/tesseract.min.js', 'vendor/tess/worker.min.js', 'vendor/tess/tesseract-core-simd-lstm.wasm.js', 'vendor/tess/tesseract-core-lstm.wasm.js', 'vendor/lang/eng.traineddata.gz', 'data/cards.json', 'icons/icon-192.png'];
 self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V && k !== 'cb-img').map(k => caches.delete(k)))).then(() => self.clients.claim())));

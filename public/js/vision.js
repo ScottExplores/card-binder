@@ -61,14 +61,14 @@ export function detectCards(cv, src, { maxCards = 9, minAreaFrac = 0.02, fast = 
       if (st.ratio < 0.58 || st.ratio > 0.86) continue;
       const pa = polyArea(quad);
       if (pa < area0 * minAreaFrac) continue;
-      cands.push({ quad, area: pa });
+      cands.push({ quad, area: pa, ratio: st.ratio });
     }
     contours.delete(); hier.delete();
   };
   const blur = new cv.Mat(); cv.GaussianBlur(gray, blur, new cv.Size(5, 5), 0);
   const edges = new cv.Mat(); const k = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
   // single-card fast path: stop after the first pass that finds a clear card (most frames), else try harder
-  const enough = () => fast && cands.some(c => c.area > area0 * 0.12);
+  const enough = () => fast && cands.some(c => c.area > area0 * 0.12 && Math.abs(c.ratio - 0.716) < 0.03);
   for (const [lo, hi] of [[30, 90], [12, 40], [60, 160]]) {
     cv.Canny(blur, edges, lo, hi); cv.dilate(edges, edges, k, new cv.Point(-1, -1), 1); tryEdges(edges); if (enough()) break;
   }
@@ -128,4 +128,9 @@ export function gridQuads(W, H, cols, rows, margin = 0.03) {
     out.push([[cx - cw / 2, cy - ch / 2], [cx + cw / 2, cy - ch / 2], [cx + cw / 2, cy + ch / 2], [cx - cw / 2, cy + ch / 2]]);
   }
   return out;
+}
+
+// Live outline: one card, small frame, stop at the first edge pass that finds a clear card.
+export function detectLive(cv, src, { n = 1 } = {}) {
+  return detectCards(cv, src, { maxCards: n, minAreaFrac: n === 9 ? 0.012 : n === 4 ? 0.03 : 0.08, fast: n === 1 });
 }

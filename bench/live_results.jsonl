@@ -1,0 +1,4 @@
+{"variant":"old","n":120,"hitRate":98.3,"found":100,"detect_med_ms":140,"detect_p90_ms":167}
+{"variant":"new","n":120,"hitRate":94.2,"found":100,"detect_med_ms":38,"detect_p90_ms":48}
+{"variant":"new640","n":120,"hitRate":96.7,"found":100,"detect_med_ms":51,"detect_p90_ms":60}
+{"variant":"new","n":120,"hitRate":95.8,"found":100,"detect_med_ms":41,"detect_p90_ms":90}

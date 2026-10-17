@@ -35,3 +35,18 @@ t('name matching tolerates OCR noise', () => {
 t('dfc face names map to full name', () => { assert.equal(idx.search('Insectile Aberration', 1)[0].full, 'Delver of Secrets // Insectile Aberration'); });
 t('norm strips accents/punct', () => assert.equal(norm("Lim-Dûl's Vault"), 'limduls vault'));
 console.log(`${n} tests passed`);
+
+// round-trip every export format back through the importer
+{
+  const { exportGoldfish, exportArchidekt, exportDeckbox, exportManaBoxCSV, exportMoxfield, exportTCGplayer, exportText, importManaBox: imp } = await import('../public/js/csv.js');
+  const P = [{ id: 'a1', name: 'Lightning Bolt', set: 'lea', set_name: 'Limited Edition Alpha', cn: '161', fin: 'n' }, { id: 'b2', name: 'Delver of Secrets // Insectile Aberration', set: 'isd', set_name: 'Innistrad', cn: '51', fin: 'nf' }];
+  const fake = { byId: new Map(P.map(p => [p.id, p])), bySetCn: new Map(P.map(p => [p.set + '/' + p.cn, p])), byName: new Map(P.map(p => [p.name, [p]])) };
+  const E = [{ ...P[0], qty: 3, finish: 'nonfoil', rarity: 'common' }, { ...P[1], qty: 1, finish: 'foil', rarity: 'common' }];
+  for (const [n, f] of Object.entries({ exportGoldfish, exportArchidekt, exportDeckbox, exportManaBoxCSV, exportMoxfield })) {
+    const r = imp(f(E), fake); const ok = r.items.length === 2 && r.items[0].qty === 3 && r.items[1].finish === 'foil' && r.items[1].print.id === 'b2';
+    if (!ok) { console.error('FAIL', n, JSON.stringify(r)); process.exit(1); } console.log('ok round-trip', n);
+  }
+  if (exportTCGplayer(E) !== '3 Lightning Bolt [LEA] 161\n1 Delver of Secrets [ISD] 51\n') { console.error('FAIL tcg', exportTCGplayer(E)); process.exit(1); }
+  if (!exportText(E).includes('1 Delver of Secrets // Insectile Aberration (ISD) 51 *F*')) { console.error('FAIL text'); process.exit(1); }
+  console.log('ok tcgplayer + text');
+}
