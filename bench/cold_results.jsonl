@@ -1,0 +1,10 @@
+{"label":"before","mode":"single","n":40,"cards":40,"name":100,"print":95,"autoAdded":95,"autoWrong":0,"median_s":2.25,"p90_s":9.97,"max_s":13.23}
+{"label":"after","mode":"single","n":40,"cards":40,"name":100,"print":95,"autoAdded":95,"autoWrong":0,"median_s":1.77,"p90_s":5.13,"max_s":5.63}
+{"label":"after-noretry","mode":"single","n":40,"cards":40,"name":100,"print":95,"autoAdded":95,"autoWrong":0,"median_s":1.65,"p90_s":4.27,"max_s":5.41}
+{"label":"probe","mode":"single","n":20,"cards":20,"name":100,"print":95,"autoAdded":90,"autoWrong":0,"median_s":1.52,"p90_s":4.25,"max_s":4.91}
+{"label":"after-v2","mode":"single","n":40,"cards":40,"name":97.5,"print":95,"autoAdded":97.5,"autoWrong":1,"median_s":1.37,"p90_s":2.88,"max_s":5.09}
+{"label":"after-v3","mode":"single","n":40,"cards":40,"name":97.5,"print":95,"autoAdded":95,"autoWrong":1,"median_s":1.35,"p90_s":2.83,"max_s":2.96}
+{"label":"after-v4","mode":"single","n":40,"cards":40,"name":97.5,"print":95,"autoAdded":95,"autoWrong":1,"median_s":1.3,"p90_s":2.69,"max_s":2.97}
+{"label":"after-v5","mode":"single","n":40,"cards":40,"name":97.5,"print":95,"autoAdded":95,"autoWrong":1,"median_s":1.28,"p90_s":2.76,"max_s":3.02}
+{"label":"after-v6","mode":"single","n":40,"cards":40,"name":97.5,"print":95,"autoAdded":95,"autoWrong":1,"median_s":1.3,"p90_s":2.84,"max_s":3.09}
+{"label":"final","mode":"single","n":40,"cards":40,"name":97.5,"print":92.5,"autoAdded":95,"autoWrong":0,"median_s":1.48,"p90_s":4.95,"max_s":6.32}

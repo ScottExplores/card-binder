@@ -1,0 +1,8 @@
+import puppeteer from 'puppeteer-core'; import { spawn } from 'child_process';
+const srv = spawn('python3', ['-m', 'http.server', '8771'], { stdio: 'ignore' }); await new Promise(r => setTimeout(r, 800));
+const br = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: 'new', args: ['--no-sandbox','--autoplay-policy=no-user-gesture-required','--disable-gpu','--disable-accelerated-video-decode'] });
+const pg = await br.newPage(); pg.on('console', m => console.log(m.text()));
+await pg.goto('http://localhost:8771/bench/bench.html'); await pg.waitForFunction('window.runBench'); await pg.evaluate(() => runBench([]));
+console.log(await pg.evaluate(async () => { const { detectCards } = await import('/public/js/vision.js'); const v = document.createElement('video'); v.muted = true; v.src = URL.createObjectURL(await (await fetch('/bench/video1.mp4')).blob()); await new Promise(r => v.onloadedmetadata = r); document.body.appendChild(v); await v.play().catch(e=>console.log('play',e.message)); v.pause(); console.log('rs', v.readyState, v.duration);
+  const out = []; for (const t of [1, 2, 5, 9]) { await new Promise(r => { v.onseeked = r; v.currentTime = t; }); const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; const g = c.getContext('2d'); g.drawImage(v, 0, 0); const d = g.getImageData(0, 0, c.width, c.height); let s = 0; for (let i = 0; i < d.data.length; i += 4000) s += d.data[i]; const m = idf.cv.matFromImageData(d); out.push([t, c.width, s, Array.from(g.getImageData(300,400,1,1).data).join('/'), detectCards(idf.cv, m, { maxCards: 12, minAreaFrac: 0.01 }).length]); m.delete(); } return JSON.stringify(out); }));
+await br.close(); srv.kill();

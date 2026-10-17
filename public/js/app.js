@@ -94,7 +94,7 @@ function drawOverlay() {
 const small = document.createElement('canvas');
 async function liveLoop() {
   if (!S.stream) return;
-  if (S.idf && !S.busy && S.tab === 'scan' && video.videoWidth) {
+  if (S.idf && !S.busy && !S.rec && S.tab === 'scan' && video.videoWidth) {
     const sc = 640 / Math.max(video.videoWidth, video.videoHeight); small.width = video.videoWidth * sc | 0; small.height = video.videoHeight * sc | 0;
     const g = small.getContext('2d', { willReadFrequently: true }); g.drawImage(video, 0, 0, small.width, small.height);
     const { detectCards } = await import('./vision.js'); const cv = S.idf.cv;
@@ -107,10 +107,10 @@ async function liveLoop() {
       const c = liveQuads[0].reduce((a, p) => [a[0] + p[0] / 4, a[1] + p[1] / 4], [0, 0]);
       const moved = lastCenter ? Math.hypot(c[0] - lastCenter[0], c[1] - lastCenter[1]) / video.videoWidth : 1;
       stableN = moved < 0.02 ? stableN + 1 : 0; lastCenter = c;
-      if (S.auto && stableN >= 2 && sawEmpty) { stableN = 0; capture({ auto: true }); }
+      if (S.auto && stableN >= 1 && sawEmpty) { stableN = 0; capture({ auto: true }); }
     } else { stableN = 0; lastCenter = null; if (!liveQuads.length) sawEmpty = true; }
   }
-  setTimeout(liveLoop, S.auto ? 250 : 400);
+  setTimeout(liveLoop, S.rec ? 600 : S.auto ? 150 : 350);
 }
 
 // ---------- capture & identify
@@ -120,9 +120,9 @@ async function capture({ auto = false, imageEl = null } = {}) {
     const idf = await engine();
     let canvas;
     if (imageEl) { canvas = document.createElement('canvas'); const s = Math.min(1, 4000 / Math.max(imageEl.naturalWidth, imageEl.naturalHeight)); canvas.width = imageEl.naturalWidth * s; canvas.height = imageEl.naturalHeight * s; canvas.getContext('2d').drawImage(imageEl, 0, 0, canvas.width, canvas.height); }
-    else { if (!video.videoWidth) { toast('Start the camera first'); return; } canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0); }
+    else { if (!video.videoWidth) { toast('Start the camera first'); return; } const cap = S.mode === 'single' ? 1920 : 2880; const s = Math.min(1, cap / Math.max(video.videoWidth, video.videoHeight)); canvas = document.createElement('canvas'); canvas.width = video.videoWidth * s | 0; canvas.height = video.videoHeight * s | 0; canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height); }
     status('Reading…');
-    const guide = !imageEl && S.mode === 'single' ? guideBoxes()[0] : null;
+    const gs = !imageEl ? canvas.width / video.videoWidth : 1; const guide = !imageEl && S.mode === 'single' ? guideBoxes()[0]?.map(p => [p[0] * gs, p[1] * gs]) : null;
     const r = await idf.identifyCanvas(canvas, { mode: S.mode, guide });
     const found = r.results.filter(x => x.match);
     if (auto) {
@@ -138,7 +138,7 @@ async function capture({ auto = false, imageEl = null } = {}) {
   } catch (e) { console.error(e); status('Error: ' + e.message); }
   finally { S.busy = false; $('#btn-shutter').classList.remove('busy'); }
 }
-$('#btn-shutter').onclick = () => capture();
+$('#btn-shutter').onclick = () => S.rec ? stopRec() : capture();
 $('#file-in').onchange = async e => { const f = e.target.files[0]; if (!f) return; const im = new Image(); im.src = URL.createObjectURL(f); await im.decode(); await capture({ imageEl: im }); e.target.value = ''; };
 
 async function addScanResults(results) {
@@ -327,3 +327,60 @@ binder.on(() => { if (S.tab === 'binder') renderBinder(); if (S.tab === 'value')
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 })();
 window.__app = { S, binder, capture, show };
+
+// ---------- Record mode: film a sweep over cards / binder pages, then review everything at once
+let recorder = null, recChunks = [];
+function setRecUI(on) { S.rec = on; $('#tg-rec').setAttribute('aria-pressed', on); $('#tg-rec').textContent = on ? '■ Stop' : '● Record'; $('#btn-shutter').classList.toggle('recording', on); }
+$('#tg-rec').onclick = () => S.rec ? stopRec() : startRec();
+async function startRec() {
+  if (!S.stream) await startCam(); if (!S.stream) return;
+  setAuto(false); engine();
+  const type = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'].find(t => window.MediaRecorder?.isTypeSupported?.(t));
+  try { recorder = new MediaRecorder(S.stream, { mimeType: type, videoBitsPerSecond: 8e6 }); } catch (e) { toast('Recording isn’t supported here — use Video instead'); return; }
+  recChunks = []; recorder.ondataavailable = e => e.data.size && recChunks.push(e.data);
+  recorder.onstop = () => { const b = new Blob(recChunks, { type: recorder.mimeType || 'video/webm' }); recChunks = []; runRecord(b); };
+  recorder.start(1000); setRecUI(true); status('Recording — sweep slowly, pause ~1 s on each card or page'); liveQuads = [];
+}
+function stopRec() { if (recorder && recorder.state !== 'inactive') recorder.stop(); setRecUI(false); }
+$('#vid-in').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (f) runRecord(f); };
+async function runRecord(blob) {
+  const ac = new AbortController(); S.busy = true;
+  openSheet(`<h3>Reading your video…</h3><div class="prog"><i id="rp"></i></div><div id="rs" class="sub small">Starting…</div><button class="btn ghost" id="rc">Cancel</button>`, root => root.querySelector('#rc').onclick = () => { ac.abort(); closeSheet(); });
+  try {
+    const idf = await engine(); const { processVideo } = await import('./record.js');
+    const r = await processVideo(idf, blob, { signal: ac.signal, onProgress: (f, msg) => { const p = $('#rp'), m = $('#rs'); if (p) p.style.width = (f * 100).toFixed(0) + '%'; if (m) m.textContent = msg; } });
+    status(`Video: ${r.cards.length} cards in ${(r.ms / 1000).toFixed(0)}s`);
+    showReview(r.cards);
+  } catch (e) { if (!ac.signal.aborted) { console.error(e); openSheet(`<h3>Couldn’t read that video</h3><p class="sub">${esc(e.message)}</p>`); } }
+  finally { S.busy = false; }
+}
+function showReview(cards) {
+  const items = cards.map(c => ({ id: Math.random().toString(36).slice(2), print: c.match, alts: c.alts || [], conf: c.conf, ocr: c.ocr, finish: chooseFinish(c.match), qty: 1, on: c.conf !== 'low', thumb: c.cardCanvas ? c.cardCanvas.toDataURL('image/jpeg', 0.6) : '' }));
+  if (!items.length) return openSheet('<h3>No cards found</h3><p class="sub">Hold each card or page still for about a second, fill most of the screen, and avoid glare.</p>');
+  const draw = root => {
+    const on = items.filter(i => i.on); const val = on.reduce((s, i) => s + (priceOf(i.print, i.finish) || 0) * i.qty, 0);
+    root.innerHTML = `<h3>${items.length} cards found</h3><div class="sub small">Red = not sure (unchecked). Tap a card to change it.</div>
+      <div class="rv">${items.map(i => `<div class="rv-it ${i.conf}" data-id="${i.id}"><input type="checkbox" ${i.on ? 'checked' : ''}><img src="${img(i.print, 'small')}" alt="" loading="lazy">
+      <div><b>${esc(i.print.name.split(' // ')[0])}</b><div class="sub small">${esc(i.print.set.toUpperCase())} #${esc(i.print.cn)}${isOldFrame(i.print) ? ' · old' : ''} · ${money(priceOf(i.print, i.finish))}</div></div>
+      <div class="q"><button data-d="-1">−</button><span>${i.qty}</span><button data-d="1">+</button></div></div>`).join('')}</div>
+      <button class="btn big primary" id="rv-add" ${on.length ? '' : 'disabled'}>Add ${on.reduce((s, i) => s + i.qty, 0)} to binder · ${money(val)}</button>`;
+    root.querySelectorAll('.rv-it').forEach(el => { const it = items.find(x => x.id === el.dataset.id);
+      el.querySelector('input').onchange = e => { it.on = e.target.checked; draw(root); };
+      el.querySelectorAll('.q button').forEach(b => b.onclick = e => { e.stopPropagation(); it.qty = Math.max(1, it.qty + +b.dataset.d); draw(root); });
+      el.querySelector('img').onclick = el.querySelector('b').onclick = () => pickReview(it, () => openSheet('', draw)); });
+    root.querySelector('#rv-add').onclick = async () => {
+      const add = items.filter(i => i.on); await binder.add(add.map(i => ({ print: i.print, finish: i.finish, qty: i.qty })), `Video (${add.length})`);
+      S.tray = [...add.map(i => ({ ...i, added: true })), ...S.tray].slice(0, 60); renderTray(); closeSheet();
+      toast(`Added ${add.reduce((s, i) => s + i.qty, 0)} cards`, undoLast);
+    };
+  };
+  openSheet('', draw);
+}
+function pickReview(it, back) {
+  const prints = printsFor(it.print.name, it.alts.map(a => a.id));
+  openSheet(`<h3>${esc(it.print.name)}</h3><input class="field" id="rn" placeholder="Wrong card? Type the name" autocomplete="off"><div id="rnl"></div>${printGrid(prints, it.print.id)}<button class="btn ghost" id="rb">Back</button>`, root => {
+    root.querySelectorAll('.pr').forEach(b => b.onclick = () => { it.print = db().byId.get(b.dataset.id); it.finish = chooseFinish(it.print); it.on = true; it.conf = 'high'; back(); });
+    root.querySelector('#rb').onclick = back;
+    root.querySelector('#rn').oninput = e => { root.querySelector('#rnl').innerHTML = nameSearch(e.target.value).map(n => `<button class="btn ghost small" data-n="${esc(n)}">${esc(n)}</button>`).join(''); root.querySelectorAll('#rnl button').forEach(b => b.onclick = () => { const p = printsFor(b.dataset.n)[0]; it.print = p; it.alts = []; it.finish = chooseFinish(p); it.on = true; pickReview(it, back); }); };
+  });
+}

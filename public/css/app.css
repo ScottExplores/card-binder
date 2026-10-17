@@ -104,3 +104,11 @@ button,select,input{font:inherit;color:inherit}
 .sugg{display:flex;flex-direction:column;gap:6px;margin-top:8px}
 .sugg button{text-align:left}
 [hidden]{display:none!important}
+.lefty{display:flex;gap:6px;flex-wrap:wrap}
+.chip.rec[aria-pressed=true]{background:#e53935;border-color:#e53935;color:#fff;animation:pulse 1s infinite}
+.shutter.recording span{background:#e53935;border-radius:8px;transform:scale(.6)}
+.rv{display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto;margin:10px 0}
+.rv-it{display:grid;grid-template-columns:28px 56px 1fr auto;gap:10px;align-items:center;padding:6px;border:1px solid var(--line);border-radius:10px}
+.rv-it.low{border-color:#e5393588}.rv-it img{width:56px;border-radius:5px}.rv-it input{width:22px;height:22px}
+.rv-it .q{display:flex;align-items:center;gap:4px}.rv-it .q button{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#0006;color:inherit}
+.prog{height:6px;background:#fff2;border-radius:3px;overflow:hidden;margin:12px 0}.prog i{display:block;height:100%;background:var(--acc);width:0}

@@ -30,12 +30,13 @@
         <button id="tg-auto" class="chip" aria-pressed="false" title="Scan automatically when a card is steady">Auto</button>
         <button id="tg-foil" class="chip" aria-pressed="false">Foil</button>
         <button id="tg-torch" class="chip" aria-pressed="false" hidden>Light</button>
+        <button id="tg-rec" class="chip rec" aria-pressed="false" title="Record a video sweeping over your cards, then review them all at once">● Record</button>
       </div>
     </div>
     <div class="scan-bottom">
       <div id="tray" class="tray"></div>
       <div class="shutter-row">
-        <label class="btn ghost small" title="Scan a photo from your gallery">Photo<input id="file-in" type="file" accept="image/*" hidden></label>
+        <div class="lefty"><label class="btn ghost small" title="Scan a photo from your gallery">Photo<input id="file-in" type="file" accept="image/*" hidden></label><label class="btn ghost small" title="Process a video of your cards">Video<input id="vid-in" type="file" accept="video/*" hidden></label></div>
         <button id="btn-shutter" class="shutter" aria-label="Scan"><span></span></button>
         <div id="scan-status" class="scan-status">Loading…</div>
       </div>

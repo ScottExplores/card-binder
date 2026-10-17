@@ -4,15 +4,17 @@ import { fuzzy } from './scry.js';
 import { db, img as imgUrl, isOldFrame } from './carddb.js';
 import { kvGet, kvSet } from './db.js';
 import { loadArt, artSearch } from './artindex.js';
+import { loadPrints, printsReady, project, simRow, searchPrints } from './printindex.js';
 
 const NAME_BAND = { x0: 0.055, x1: 0.80, y0: 0.035, y1: 0.098 };
 
 export class Identifier {
   constructor({ cv, Tesseract, names, NameIndex, workers = 2, base = './vendor/' }) {
-    this.cv = cv; this.index = new NameIndex(names); this.T = Tesseract; this.nW = workers; this.base = base; this.featCache = new Map();
+    this.cv = cv; this.index = new NameIndex(names); this.T = Tesseract; this.nW = workers; this.base = base; this.featCache = new Map(); this.T_SIM = { a: 0.73, b: 0.26 };
   }
   async init(progress) {
-    this.artReady = loadArt(this.base.replace(/vendor\/?$/, 'data/art.bin')).then(() => true).catch(() => false);
+    const dataBase = this.base.replace(/vendor\/?$/, 'data/'); this.printsReady = loadPrints(dataBase + 'prints.bin').then(() => true).catch(() => false);
+    this.artReady = loadArt(dataBase + 'art.bin').then(() => true).catch(() => false);
     const T = this.T; this.sched = T.createScheduler();
     const opts = { workerPath: this.base + 'tess/worker.min.js', corePath: this.base + 'tess/', langPath: this.base + 'lang', gzip: true, cacheMethod: 'write' };
     await Promise.all(Array.from({ length: this.nW }, async () => {
@@ -72,12 +74,14 @@ export class Identifier {
     this.featCache.set(card.id, p); return p;
   }
   // ---------- main
-  async identifyCanvas(input, { mode = 'single', guide = null } = {}) {
+  async identifyCanvas(input, opts = {}) {
+    const { mode = 'single', guide = null } = opts;
     const cv = this.cv; const t0 = performance.now();
     const src = toMat(cv, input);
-    const n = mode === 'grid3' ? 9 : mode === 'grid2' ? 4 : 1;
-    let quads = detectCards(cv, src, { maxCards: n === 1 ? 3 : n + 2, minAreaFrac: n === 9 ? 0.012 : n === 4 ? 0.03 : 0.06 });
-    if (n === 1) {
+    const n = mode === 'grid3' ? 9 : mode === 'grid2' ? 4 : mode === 'multi' ? 12 : 1;
+    let quads = opts.quads || detectCards(cv, src, { maxCards: n === 1 ? 3 : n + 2, minAreaFrac: n === 12 ? 0.01 : n === 9 ? 0.012 : n === 4 ? 0.03 : 0.06, fast: false, maxSide: 900 });
+    if (mode === 'multi') quads = quads.map(q => ({ q, detected: true }));
+    else if (n === 1) {
       // choose the most central big quad, else fall back to the guide box
       if (quads.length > 1) quads.sort((a, b) => qarea(b) - qarea(a)); // biggest card in view
       quads = quads.slice(0, 1).map(q => ({ q, detected: true }));
@@ -94,7 +98,7 @@ export class Identifier {
       let r = await this.identifyCard(card); let used = q, cardC = card;
       const alts = [q.inner, shrink(q, 0.03)].filter(Boolean);
       for (const aq of alts) { // sleeve edge / loose crop: retry tighter if not confident
-        if (r.conf === 'high') break;
+        if (r.conf === 'high' || (r.conf === 'medium' && !r.viaArt)) break;
         const w2 = warpCard(cv, src, aq); const c2 = this.matToCanvas(w2); w2.delete();
         const r2 = await this.identifyCard(c2);
         if (r2.match && (!r.match || (r2.combined ?? -9) > (r.combined ?? -9))) { r = r2; used = aq; cardC = c2; }
@@ -105,7 +109,7 @@ export class Identifier {
     return { results: results.filter(r => r.match || r.detected), ms: performance.now() - t0, tDetect };
   }
   // OCR the title bar with several preprocessing variants and pool the candidate names.
-  async readName(card) {
+  async readName(card, verify = null, artDecisive = null) {
     const B2 = { ...NAME_BAND, y0: 0.025, y1: 0.105 };
     const stages = [
       [['white', NAME_BAND], ['dark', NAME_BAND], ['auto', NAME_BAND]],
@@ -119,21 +123,28 @@ export class Identifier {
       for (const o of outs) { texts.push(o.text); this.index.search(o.text, 2).forEach((c, i) => { if (i === 0 || c.score < 0.3) addC(c, o.rot); }); }
       const ranked = this.rank(pool);
       if (ranked[0] && (ranked[0].eff < 0.06 || (ranked[0].votes >= 2 && ranked[0].score < 0.2))) break;
+      if (verify && ranked[0] && !ranked[0].rot && (ranked[0].score < 0.25 ? verify(ranked[0].full) > 0.8 : ranked[0].score < 0.4 && verify(ranked[0].full) > 0.9)) break; // artwork confirms the read: done
+      if (artDecisive && artDecisive()) break; // unreadable title but the artwork alone is unmistakable: skip the slow OCR retries
     }
-    return { text: texts.filter(Boolean).join(' | '), cands: this.rank(pool).slice(0, 4), rot: this.rank(pool)[0]?.rot };
+    return { text: texts.filter(Boolean).join(' | '), cands: this.rank(pool).slice(0, 4), all: this.rank(pool), rot: this.rank(pool)[0]?.rot };
   }
   rank(pool) { return [...pool.values()].map(c => ({ ...c, eff: c.score - 0.07 * (c.votes - 1) })).sort((a, b) => a.eff - b.eff); }
   async identifyCard(card) {
     const t0 = performance.now();
-    let rd = await this.readName(card);
+    const cf0 = this.feat(card); const z0 = printsReady() ? project(cf0) : null;
+    const verify = z0 ? name => { let m = -1; for (const p of db().byName.get(name) || []) { const v = simRow(z0, p.row); if (v != null && v * this.T_SIM.a + this.T_SIM.b > m) m = v * this.T_SIM.a + this.T_SIM.b; } return m; } : null;
+    let artMemo; const artDecisive = z0 ? () => artMemo ??= (() => { const T = this.T_SIM, P = db().prints; const hits = searchPrints(z0, 12); const best = hits[0]; if (!best) return false; const other = hits.find(h => P[h.row]?.name !== P[best.row]?.name); return best.s * T.a + T.b > 0.9 && (!other || (best.s - other.s) * T.a > 0.08); })() : null;
+    let rd = await this.readName(card, verify, artDecisive);
+    if (rd.rot && verify) { const nr = rd.all.filter(c => !c.rot && c.score < 0.5).map(c => [c, verify(c.full)]).sort((a, b) => b[1] - a[1])[0]; if (nr && nr[1] > 0.8) { rd.rot = false; rd.cands = [nr[0], ...rd.all.filter(c => !c.rot && c !== nr[0])].slice(0, 4); } }
     if (rd.rot) { const c = mk(card.width, card.height); const g = c.getContext('2d'); g.translate(c.width, c.height); g.rotate(Math.PI); g.drawImage(card, 0, 0); card = c; }
     let cands = rd.cands.filter(c => c.score < 0.5);
-    const cf = this.feat(card);
+    const cf = rd.rot ? this.feat(card) : cf0;
     // art fallback: when the name read is shaky, add names whose artwork looks like this card
     if (!(cands[0] && cands[0].eff < 0.06) && await this.artReady) {
       const have = new Set(cands.map(c => c.full)); const texts = (rd.text || '').split(' | ').filter(t => t.length > 2);
       const P = db().prints;
-      for (const h of artSearch(cf.art, 14)) {
+      const zz = printsReady() ? project(cf) : null;
+      for (const h of [...(zz ? searchPrints(zz, 8) : []), ...artSearch(cf.art, 14)]) {
         const p = P[h.row]; if (!p || have.has(p.name)) continue; have.add(p.name);
         // how well does the OCR text support this name? (0 = perfect, capped)
         let ts = 0.45; for (const t of texts) { const r = this.index.scoreName(p.name, t); if (r < ts) ts = r; }
@@ -147,23 +158,30 @@ export class Identifier {
       if (!f) return { match: null, ocr: rd.text, ms: performance.now() - t0 };
       cands = [{ full: f.name, score: 0.35, eff: 0.35 }];
     }
+    const z = printsReady() ? project(cf) : null; const T = this.T_SIM;
+    const score = async p => { if (z) { const v = simRow(z, p.row); if (v != null) return v * T.a + T.b; } const f = await this.printFeat(p); return f ? this.sim(cf, f) : -1; };
     let bestAll = null; const allComb = [];
     for (const nc of cands.slice(0, 10)) {
       const prints = db().byName.get(nc.full) || []; if (!prints.length) continue;
-      let scored = (await Promise.all((nc.art ? prints.slice(0, 40) : prints.slice(0, 120)).map(async p => { const f = await this.printFeat(p); const v = f ? this.sim(cf, f) : -1; return { p, s: Number.isFinite(v) ? v : -1 }; }))).sort((a, b) => b.s - a.s);
+      let scored = (await Promise.all((nc.art ? prints.slice(0, 40) : z ? prints : prints.slice(0, 120)).map(async p => { const v = await score(p); return { p, s: Number.isFinite(v) ? v : -1 }; }))).sort((a, b) => b.s - a.s);
       const combined = scored[0].s - nc.eff * 1.2 - (nc.art && scored[0].p.fullart && nc.eff > 0.3 ? 0.12 : 0); // borderless art is generic-looking
       allComb.push(combined);
       if (!bestAll || combined > bestAll.combined) bestAll = { nc, scored, combined };
       if (nc.eff < 0.05 && scored[0].s > 0.6) break; // confident text + matching art: done
     }
     if (!bestAll) return { match: null, ocr: rd.text, ms: performance.now() - t0 };
+    if (z && bestAll.scored.length > 1 && this.refine !== false && bestAll.scored[0].s - bestAll.scored[1].s < 0.05) { // exact check of the top few printings (small images, cached after first use); never blocks long
+      const top = bestAll.scored.slice(0, 4); const tmo = new Promise(r => setTimeout(() => r(null), 1200));
+      const ex = await Promise.all(top.map(x => Promise.race([this.printFeat(x.p).catch(() => null), tmo]).then(f => f ? this.sim(cf, f) : null)));
+      if (ex.every(v => v != null)) { top.forEach((x, i) => x.s = ex[i]); const lo = Math.min(...ex) - 0.01; bestAll.scored.slice(4).forEach(x => x.s = Math.min(x.s, lo)); bestAll.scored.sort((a, b) => b.s - a.s); }
+    }
     const { scored, nc } = bestAll;
     const top = scored[0].s;
     // ambiguous printings (same art reprints): lean to old frame, then oldest
     const near = scored.filter(x => x.s >= top - 0.03);
     const pick = near.find(x => isOldFrame(x.p)) || near[0];
     const margin = bestAll.combined - (allComb.sort((a, b) => b - a)[1] ?? -1);
-    const conf = nc.art ? (pick.s >= 0.85 && margin > 0.08 ? 'high' : pick.s >= 0.7 && margin > 0.03 ? 'medium' : 'low') : bestAll.scored[0].s < 0.35 && nc.eff > 0.15 ? 'low' : nc.eff < 0.15 && (scored.length === 1 || near.length === 1 || top - (scored.find(x => !near.includes(x))?.s ?? 0) > 0.05) ? 'high' : nc.score < 0.3 ? 'medium' : 'low';
+    const conf = !nc.art && pick.s >= 0.85 && nc.eff < 0.45 && margin > 0.1 ? 'high' : nc.art ? (pick.s >= 0.85 && margin > 0.08 ? 'high' : pick.s >= 0.7 && margin > 0.03 ? 'medium' : 'low') : bestAll.scored[0].s < 0.35 && nc.eff > 0.15 ? 'low' : nc.eff < 0.15 && (scored.length === 1 || near.length === 1 || top - (scored.find(x => !near.includes(x))?.s ?? 0) > 0.05) ? 'high' : nc.score < 0.3 ? 'medium' : 'low';
     return { match: pick.p, viaArt: !!nc.art, combined: bestAll.combined, alts: scored.slice(0, 40).map(x => x.p), printAmbiguous: near.length > 1, nameScore: nc.eff, imgSim: pick.s, conf, ocr: rd.text, ms: performance.now() - t0 };
   }
 }

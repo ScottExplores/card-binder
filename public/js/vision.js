@@ -24,8 +24,8 @@ function quadStats(q) {
 function polyArea(q) { let a = 0; for (let i = 0; i < 4; i++) { const p = q[i], n = q[(i + 1) % 4]; a += p[0] * n[1] - n[0] * p[1]; } return Math.abs(a) / 2; }
 
 // Find card-shaped quads. Returns array of quads (in source pixel coords), sorted reading order.
-export function detectCards(cv, src, { maxCards = 9, minAreaFrac = 0.02 } = {}) {
-  const scale = Math.min(1, 900 / Math.max(src.cols, src.rows));
+export function detectCards(cv, src, { maxCards = 9, minAreaFrac = 0.02, fast = false, maxSide = 900 } = {}) {
+  const scale = Math.min(1, maxSide / Math.max(src.cols, src.rows));
   const small = new cv.Mat(); cv.resize(src, small, new cv.Size(0, 0), scale, scale, cv.INTER_AREA);
   const gray = new cv.Mat(); cv.cvtColor(small, gray, cv.COLOR_RGBA2GRAY);
   const area0 = small.cols * small.rows;
@@ -67,12 +67,14 @@ export function detectCards(cv, src, { maxCards = 9, minAreaFrac = 0.02 } = {}) 
   };
   const blur = new cv.Mat(); cv.GaussianBlur(gray, blur, new cv.Size(5, 5), 0);
   const edges = new cv.Mat(); const k = cv.getStructuringElement(cv.MORPH_RECT, new cv.Size(3, 3));
-  for (const [lo, hi] of [[12, 40], [30, 90], [60, 160]]) {
-    cv.Canny(blur, edges, lo, hi); cv.dilate(edges, edges, k, new cv.Point(-1, -1), 1); tryEdges(edges);
+  // single-card fast path: stop after the first pass that finds a clear card (most frames), else try harder
+  const enough = () => fast && cands.some(c => c.area > area0 * 0.12);
+  for (const [lo, hi] of [[30, 90], [12, 40], [60, 160]]) {
+    cv.Canny(blur, edges, lo, hi); cv.dilate(edges, edges, k, new cv.Point(-1, -1), 1); tryEdges(edges); if (enough()) break;
   }
   // adaptive threshold pass helps dark backgrounds / sleeves
-  cv.adaptiveThreshold(blur, edges, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 31, 4);
-  cv.bitwise_not(edges, edges); cv.morphologyEx(edges, edges, cv.MORPH_CLOSE, k); tryEdges(edges);
+  if (!enough()) { cv.adaptiveThreshold(blur, edges, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 31, 4);
+  cv.bitwise_not(edges, edges); cv.morphologyEx(edges, edges, cv.MORPH_CLOSE, k); tryEdges(edges); }
   [small, gray, blur, edges, k].forEach(m => m.delete());
   // non-max suppression: drop quads whose center lies inside a bigger kept quad... prefer the largest
   // non-nested; but a sleeve gives nested quads (sleeve + card) - keep the outer if similar size (>80%).
