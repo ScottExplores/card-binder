@@ -39,17 +39,17 @@ await pg.click('.tabs [data-tab=binder]'); await sleep(1500);
 const pillTxt = await pg.$eval('#job-pill', e => !e.hidden && e.textContent); console.log('pill while running:', pillTxt); assert.match(pillTxt, /Reading video/);
 await pg.screenshot({ path: (process.env.SHOTS || 'screens') + '/job-pill.png' });
 await pg.click('#job-pill'); await pg.waitForSelector('#rh'); await pg.click('#rh');
-await pg.waitForFunction(() => /to review/.test(document.querySelector('#job-pill').textContent), { timeout: 600000 });
-console.log('pill when done:', await pg.$eval('#job-pill', e => e.textContent));
-await pg.reload(); await pg.waitForFunction(() => /to review/.test(document.querySelector('#job-pill').textContent) && !document.querySelector('#job-pill').hidden, { timeout: 60000 });
-console.log('pill after reload:', await pg.$eval('#job-pill', e => e.textContent));
-await pg.click('#job-pill'); await pg.waitForSelector('#rv-add'); await sleep(1500); await pg.screenshot({ path: (process.env.SHOTS || 'screens') + '/video-review.png' });
 const n0 = await pg.evaluate(() => window.__app.binder.totals().count);
-await pg.click('#rv-add'); await sleep(800);
-const n1 = await pg.evaluate(() => window.__app.binder.totals().count); console.log('binder count', n0, '->', n1); assert(n1 > n0);
-assert(await pg.$eval('#job-pill', e => e.hidden), 'pill gone after adding');
+await pg.waitForFunction(() => /Video done/.test(document.querySelector('#toast').textContent) || /to check/.test(document.querySelector('#job-pill').textContent), { timeout: 600000 });
+console.log('when done:', await pg.$eval('#toast', e => e.textContent), '|', await pg.$eval('#job-pill', e => e.hidden ? '' : e.textContent));
+const n1 = await pg.evaluate(() => window.__app.binder.totals().count); console.log('binder count', n0, '->', n1); assert(n1 > n0, 'confident cards auto-added');
+if (await pg.$eval('#job-pill', e => !e.hidden && /to check/.test(e.textContent))) {
+  await pg.reload(); await pg.waitForFunction(() => /to check/.test(document.querySelector('#job-pill').textContent) && !document.querySelector('#job-pill').hidden, { timeout: 60000 });
+  await pg.click('#job-pill'); await pg.waitForSelector('#rv-add'); await sleep(1500); await pg.screenshot({ path: (process.env.SHOTS || 'screens') + '/video-review.png' });
+  pg.once('dialog', d => d.accept()); await pg.click('#rv-discard'); await sleep(800); assert(await pg.$eval('#job-pill', e => e.hidden), 'pill gone after discarding');
+}
 await pg.waitForFunction(() => document.querySelector('#scan-status').textContent.length > 0);
-await pg.click('.tabs [data-tab=scan]'); const inp2 = await pg.$('#vid-in'); await inp2.uploadFile(vid); await pg.waitForSelector('#rc'); await sleep(1500); await pg.click('#rc'); await sleep(2000);
+await pg.click('.tabs [data-tab=scan]'); const inp2 = await pg.$('#vid-in'); await inp2.uploadFile(vid); await pg.waitForSelector('#rc'); await sleep(1500); pg.once('dialog', d => d.accept()); await pg.click('#rc'); await sleep(2000);
 assert(await pg.$eval('#job-pill', e => e.hidden), 'pill gone after cancel'); console.log('cancel ok');
 await pg.click('.tabs [data-tab=value]'); await pg.click('#btn-export'); await pg.waitForSelector('.exp button');
 console.log('export options:', await pg.$$eval('.exp button', b => b.map(x => x.textContent).join(' | ')));

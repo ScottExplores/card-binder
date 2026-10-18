@@ -113,6 +113,38 @@ export class Identifier {
     finally { src.delete(); }
     return { results: results.filter(r => r.match || r.detected), ms: performance.now() - t0, tDetect };
   }
+  // Fast scan: match the whole card picture against the local index of every printing (no OCR, a few ms).
+  // Returns { match: null } when the picture alone isn't decisive; the caller then runs the full reader.
+  identifyFast(card) {
+    if (!printsReady()) return { match: null };
+    const t0 = performance.now(); const T = this.T_SIM, P = db().prints;
+    const z = project(this.feat(card)); const hits = searchPrints(z, 16); const best = hits[0]; if (!best || !P[best.row]) return { match: null };
+    const name = P[best.row].name; const other = hits.find(h => P[h.row] && P[h.row].name !== name);
+    const s = best.s * T.a + T.b, margin = other ? (best.s - other.s) * T.a : 1;
+    if (!(s > 0.86 && margin > 0.06)) return { match: null, s, margin, cand: name, ms: performance.now() - t0 };
+    const scored = (db().byName.get(name) || []).map(p => ({ p, s: simRow(z, p.row) ?? -1 })).sort((a, b) => b.s - a.s);
+    if (!scored.length) return { match: null };
+    const top = scored[0].s, near = scored.filter(x => x.s >= top - 0.03), tie = scored.filter(x => x.s >= top - 0.008);
+    const reprint = p => /^(plst|plist|sld|slx|prm|pmei|ppro|plg\d*|pura)$/.test(p.set) || /^p/.test(p.set) && p.set.length === 4;
+    const pick = tie.length > 1 ? (tie.find(x => !reprint(x.p)) || tie[0]) : scored[0];
+    return { match: pick.p, alts: scored.slice(0, 40).map(x => x.p), conf: s > 0.9 && margin > 0.08 ? 'high' : 'medium', imgSim: s, margin, printAmbiguous: near.length > 1, viaFast: true, ms: performance.now() - t0 };
+  }
+  // Fast scan on a crop around the card box: one outline pass, then the picture match on the outline and its tighter
+  // variants (card inside a sleeve, top card of a pile). No OCR. inner = the card box inside the crop [x, y, w, h].
+  fastRead(wide, inner, { maxSide = 480, fast = true } = {}) {
+    const cv = this.cv; const t0 = performance.now(); const m = toMat(cv, wide); let quad = null, best = null, card = null;
+    try {
+      const qs = detectCards(cv, m, { maxCards: 3, minAreaFrac: 0.25, fast, maxSide }); quad = qs.sort((a, b) => qarea(b) - qarea(a))[0] || null;
+      const box = inner ? [[inner[0], inner[1]], [inner[0] + inner[2], inner[1]], [inner[0] + inner[2], inner[1] + inner[3]], [inner[0], inner[1] + inner[3]]] : null;
+      const tries = quad ? [quad, quad.inner, ...(quad.nest || []).slice(0, 3), shrink(quad, 0.03)].filter(Boolean) : box ? [box] : [];
+      for (const q of tries) {
+        const w = warpCard(cv, m, q); const c = this.matToCanvas(w); w.delete(); card ??= c;
+        const r = this.identifyFast(c); if (r.match) { best = { ...r, quad: q, cardCanvas: c }; break; }
+        if (!best || (r.s ?? 0) > (best.s ?? 0)) best = { ...r, quad: q, cardCanvas: c };
+      }
+    } finally { m.delete(); }
+    return { ...(best || { match: null }), found: !!quad, cardCanvas: best?.cardCanvas || card, ms: performance.now() - t0 };
+  }
   // OCR the title bar with several preprocessing variants and pool the candidate names.
   async readName(card, verify = null, artDecisive = null) {
     const B2 = { ...NAME_BAND, y0: 0.025, y1: 0.105 };

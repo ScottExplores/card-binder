@@ -3,7 +3,7 @@ import { loadDB, db, img, priceOf, defaultFinish, isOldFrame } from './carddb.js
 import { Binder, DEFAULT_BINDER } from './binder.js';
 import { exportCSV, exportMoxfield, importManaBox, exportGoldfish, exportArchidekt, exportDeckbox, exportManaBoxCSV, exportTCGplayer, exportText, exportSellTCG, exportEbay, ebayTitle } from './csv.js';
 import { collection } from './scry.js';
-import { kvGet, kvSet, kvSetRequired } from './db.js';
+import { kvGet, kvSet, kvSetRequired, kvDel } from './db.js';
 import { $, $$, esc, money, short, toast, openSheet, closeSheet, sheetOpen, alertBuzz, download, stamp, copyOrSave } from './ui.js';
 import { loadMeta, info, FORMATS, FORMAT_LABEL } from './meta.js';
 import { DEFAULT_F, applyFilters, sortEntries, SORTS, activeCount, unitPrice, condMult } from './filters.js';
@@ -105,7 +105,7 @@ function drawOverlay() {
   g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, overlay.width, overlay.height);
   const m = viewMap(); const P = p => [p[0] * m.s + m.ox, p[1] * m.s + m.oy];
   const poly = (q, color, w, dash) => { g.beginPath(); q.map(P).forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); g.setLineDash(dash || []); g.lineWidth = w; g.strokeStyle = color; g.stroke(); };
-  for (const b of guideBoxes()) poly(b, '#ffffff88', 2, [10, 8]);
+  for (const b of guideBoxes()) S.fast ? poly(b, FAST.flash > performance.now() ? '#2ecc71' : '#3ea6ff', 5) : poly(b, '#ffffff88', 2, [10, 8]);
   for (const q of liveQuads) poly(q, stableN >= 2 ? '#2ecc71' : '#3ea6ff', 4);
   requestAnimationFrame(drawOverlay);
 }
@@ -140,7 +140,7 @@ function onLive(qs, sc) {
 async function liveLoop() {
   if (!S.stream) return;
   const gap = S.rec ? 500 : JOB.state === 'running' ? 250 : 70; // gentle while a video is being read
-  if (!S.busy && !S.rec && S.tab === 'scan' && video.videoWidth && performance.now() - LIVE.last > gap) {
+  if (!S.busy && !S.rec && !S.fast && S.tab === 'scan' && video.videoWidth && performance.now() - LIVE.last > gap) {
     const n = liveN(); const sz = n === 1 ? 480 : 640; const sc = sz / Math.max(video.videoWidth, video.videoHeight);
     const w = video.videoWidth * sc | 0, h = video.videoHeight * sc | 0;
     if (LIVE.ready && !LIVE.busy) {
@@ -189,7 +189,7 @@ $('#file-in').onchange = async e => { const f = e.target.files[0]; if (!f) retur
 
 const thumbOf = c => { if (!c) return ''; const t = document.createElement('canvas'); t.width = 146; t.height = 204; t.getContext('2d').drawImage(c, 0, 0, 146, 204); return t.toDataURL('image/jpeg', 0.6); };
 // confident reads go straight in (Undo in the toast); unsure ones wait for a tap. Same-art reprints are added but flagged "check printing".
-async function addScanResults(results) {
+async function addScanResults(results, { quiet = false } = {}) {
   const items = []; const deck = destDeck();
   const newTray = results.map(r => {
     const t = { id: Math.random().toString(36).slice(2), print: r.match, alts: r.alts || [], conf: r.match ? r.conf : 'low', amb: !!r.printAmbiguous, ocr: r.ocr, added: false, finish: 'nonfoil', thumb: thumbOf(r.cardCanvas), dest: deck ? { deck: deck.id } : { binder: S.dest.binder } };
@@ -207,8 +207,8 @@ async function addScanResults(results) {
     const b = batchId();
     await binder.add(items.map(i => ({ print: i.print, finish: i.finish, qty: 1, binder: S.dest.binder, batch: b })), `Scan (${items.length})`);
     const unsure = newTray.filter(t => !t.added).length, amb = items.filter(i => i.t.amb).length;
-    toast(`Added ${items.length} to ${S.dest.binder}` + (unsure ? ` · ${unsure} need a look` : '') + (amb && !unsure ? ` · check printing on ${amb}` : ''), undoLast);
-  } else if (newTray.length) toast('Couldn’t read that one — tap it to pick the card');
+    if (!quiet) toast(`Added ${items.length} to ${S.dest.binder}` + (unsure ? ` · ${unsure} need a look` : '') + (amb && !unsure ? ` · check printing on ${amb}` : ''), undoLast);
+  } else if (newTray.length && !quiet) toast('Couldn’t read that one — tap it to pick the card');
   renderDest();
 }
 const chooseFinish = p => S.foil && (p.fin.includes('f') || p.fin.includes('e')) ? (p.fin.includes('f') ? 'foil' : 'etched') : defaultFinish(p);
@@ -252,9 +252,103 @@ async function setTrayPrint(t, p, finish, cond = t.cond || 'NM') {
   Object.assign(t, { print: p, finish, cond, added: true, conf: 'high', amb: false }); renderTray(); renderDest();
   toast(`${short(p.name)} · ${p.set.toUpperCase()} #${p.cn}${finish !== 'nonfoil' ? ' · ' + finish : ''}${cond !== 'NM' ? ' · ' + cond : ''}`, t.dest?.deck ? null : undoLast);
 }
+// ---------- Fast scan ("boop boop boop"): a fixed card box, no hunting for the card.
+// Every camera frame, the box is shrunk to 40x56 grey pixels and compared with the last frame. When something moved and then
+// holds still for ~3 frames (about 0.1 s) and looks different from the last card, the box is cropped at full resolution and
+// matched straight against the picture index (a few ms, no OCR). Boop + buzz, it goes in, ready for the next card.
+// Cards the picture alone can't settle go to the full reader in the background, so the next card never waits.
+const FAST = { n: 0, t0: 0, prev: null, still: 0, armed: true, lastCap: null, q: [], busy: 0, flash: 0, log: [], locked: false };
+window.__fast = FAST;
+const fastTiny = document.createElement('canvas'); fastTiny.width = 40; fastTiny.height = 56;
+const fastG = fastTiny.getContext('2d', { willReadFrequently: true });
+const grayOf = () => { const d = fastG.getImageData(0, 0, 40, 56).data; const o = new Uint8Array(40 * 56); for (let i = 0; i < o.length; i++) o[i] = (d[i * 4] * 3 + d[i * 4 + 1] * 6 + d[i * 4 + 2]) / 10; return o; };
+const gdiff = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += Math.abs(a[i] - b[i]); return s / a.length; };
+function setFast(on) {
+  if (on && S.mode !== 'single') return;
+  S.fast = on; $('#tg-fast').setAttribute('aria-pressed', on); document.body.classList.toggle('fast', on);
+  if (on) { setAuto(false); Object.assign(FAST, { n: 0, t0: 0, prev: null, still: 0, armed: true, lastCap: null }); liveQuads = []; engine(); if (!S.stream) startCam(); lockCamera(true); status('Fast: slide cards into the box one after another'); if (!FAST.ticking) { FAST.ticking = true; fastTick(); } }
+  else { lockCamera(false); if (S.stream) status(S.idf ? 'Ready' : 'Loading…'); }
+  kvSet('fast', on);
+}
+$('#tg-fast').onclick = () => setFast(!S.fast);
+// lock focus / exposure / white balance where the browser allows it (Chrome on Android; iPhone Safari doesn't expose these)
+async function lockCamera(on) {
+  const tr = S.stream?.getVideoTracks()[0]; if (!tr?.getCapabilities) return; const caps = tr.getCapabilities(), st = tr.getSettings?.() || {};
+  try {
+    if (on) {
+      await new Promise(r => setTimeout(r, 1200)); if (!S.fast) return; // let it focus on the first card first
+      const adv = [];
+      if (caps.focusMode?.includes('manual') && st.focusDistance != null) adv.push({ focusMode: 'manual', focusDistance: st.focusDistance });
+      if (caps.exposureMode?.includes('manual') && st.exposureTime != null) adv.push({ exposureMode: 'manual', exposureTime: st.exposureTime });
+      if (caps.whiteBalanceMode?.includes('manual')) adv.push({ whiteBalanceMode: 'manual' });
+      if (adv.length) { await tr.applyConstraints({ advanced: adv }); FAST.locked = true; }
+    } else if (FAST.locked) {
+      const adv = []; if (caps.focusMode?.includes('continuous')) adv.push({ focusMode: 'continuous' }); if (caps.exposureMode?.includes('continuous')) adv.push({ exposureMode: 'continuous' }); if (caps.whiteBalanceMode?.includes('continuous')) adv.push({ whiteBalanceMode: 'continuous' });
+      await tr.applyConstraints({ advanced: adv }); FAST.locked = false;
+    }
+  } catch { }
+}
+// one step per NEW camera frame (requestVideoFrameCallback); counting repeated screen refreshes of the same frame as "still" would fire too early
+function fastTick() {
+  if (!S.fast) { FAST.ticking = false; return; }
+  const go = () => video.requestVideoFrameCallback ? video.requestVideoFrameCallback(fastTick) : requestAnimationFrame(fastTick);
+  if (!S.stream || !video.videoWidth || S.tab !== 'scan' || !S.idf || S.rec) return setTimeout(go, 50);
+  const box = guideBoxes()[0]; if (!box) return go();
+  const [x0, y0] = box[0], [x1, y1] = box[2];
+  fastG.drawImage(video, x0, y0, x1 - x0, y1 - y0, 0, 0, 40, 56); const g = grayOf();
+  const mo = FAST.prev ? gdiff(g, FAST.prev) : 99; FAST.frames = (FAST.frames || 0) + 1; if (FAST.trace) FAST.trace.push([performance.now() | 0, +mo.toFixed(1), FAST.lastCap ? +gdiff(g, FAST.lastCap).toFixed(1) : -1]);
+  if (mo === 0 && !video.requestVideoFrameCallback) return go(); // same frame again (rAF fallback)
+  const now = performance.now(), gap = now - (FAST.prevT || 0); FAST.prev = g; FAST.prevT = now;
+  // still = this frame matches the previous one; two in a row, or one over a long gap (the phone skipped frames while busy)
+  if (mo > 6) { FAST.armed = true; FAST.still = 0; }
+  else if (FAST.armed && (++FAST.still >= 2 || gap > 60) && (!FAST.lastCap || gdiff(g, FAST.lastCap) > 4)) { FAST.armed = false; FAST.still = 0; FAST.lastCap = g; fastCapture(box); }
+  go();
+}
+function fastCapture(box) {
+  const tCap = performance.now(); const [x0, y0] = box[0], [x1, y1] = box[2];
+  // the box at full resolution, plus a 6% margin so a card that's a little off still fits
+  const mx = (x1 - x0) * 0.06, my = (y1 - y0) * 0.06; const sx = Math.max(0, x0 - mx), sy = Math.max(0, y0 - my), sw = Math.min(video.videoWidth, x1 + mx) - sx, sh = Math.min(video.videoHeight, y1 + my) - sy;
+  const sc = Math.min(1, 900 / sh); const wide = document.createElement('canvas'); wide.width = sw * sc | 0; wide.height = sh * sc | 0; wide.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, wide.width, wide.height);
+  FAST.q.push({ wide, tCap, inner: [(x0 - sx) * sc, (y0 - sy) * sc, (x1 - x0) * sc, (y1 - y0) * sc] }); fastWork();
+}
+async function fastWork() {
+  while (FAST.q.length && FAST.busy < 1) {
+    const job = FAST.q.shift(); FAST.busy++;
+    (async () => {
+      const idf = S.idf; const { wide, inner, tCap } = job; const cv = idf.cv;
+      // one outline pass inside the box, then the picture match (no OCR)
+      let r = idf.fastRead(wide, inner); let card = r.cardCanvas; const quad = r.found; const tFast = performance.now();
+      const capId = (FAST.capN = (FAST.capN || 0) + 1);
+      if (window.__fastDbg) window.__fastDbg.push({ id: capId, quad: !!quad, img: card ? card.toDataURL('image/jpeg', 0.92) : '', wide: wide.toDataURL('image/jpeg', 0.92), inner });
+      let path = 'fast';
+      const fr = r;
+      if (!r.match && quad && !window.__fastNoFull) { // the picture alone wasn't enough: full reader (title OCR + outline retries), one at a time, never blocking new captures
+        path = 'full'; FAST.busy--; FAST.full = (FAST.full || Promise.resolve()).then(async () => { const ib = [[inner[0], inner[1]], [inner[0] + inner[2], inner[1]], [inner[0] + inner[2], inner[1] + inner[3]], [inner[0], inner[1] + inner[3]]];
+          const rr = await idf.identifyCanvas(wide, { mode: 'single', guide: ib }); return rr.results[0] || { match: null }; }); const fp = FAST.full; FAST.full = fp.catch(() => {});
+        try { r = await fp; } finally { FAST.busy++; } if (r.cardCanvas) card = r.cardCanvas; }
+      const tDone = performance.now();
+      FAST.log.push({ id: capId, path, ms: tDone - tCap, fastMs: tFast - tCap, name: r.match?.name || null, conf: r.conf || null, t: tCap, fs: fr.s, fm: fr.margin, fname: fr.match?.name || fr.cand }); if (FAST.log.length > 500) FAST.log.shift();
+      if (r.match && r.conf !== 'low') {
+        if (!FAST.t0) FAST.t0 = tCap; FAST.n++; FAST.flash = performance.now() + 250; boop(true);
+        const rate = FAST.n > 1 ? (FAST.n - 1) / ((tCap - FAST.t0) / 1000) : 0;
+        status(`⚡ ${FAST.n} card${FAST.n === 1 ? '' : 's'}${rate ? ` · ${rate.toFixed(1)}/s` : ''} · ${short(r.match.name)}`);
+        await addScanResults([{ ...r, cardCanvas: card }], { quiet: true });
+      } else if (quad) { boop(false); await addScanResults([{ ...(r.match ? r : { match: null }), conf: 'low', cardCanvas: card }], { quiet: true }); status('Not sure about that one — tap it in the tray'); }
+    })().catch(e => console.error(e)).finally(() => { FAST.busy--; fastWork(); });
+  }
+}
+// boop: short high tone + tap for a card in, low tone for "check this one". iPhone has no vibrate(); a hidden switch gives a tap (iOS 18+).
+let boopAC = null, hapt = null;
+function boop(ok) {
+  try { navigator.vibrate?.(ok ? 25 : [60, 40, 60]); } catch { }
+  try { if (!navigator.vibrate) { if (!hapt) { hapt = document.createElement('label'); hapt.style.cssText = 'position:fixed;left:-99px;width:1px;height:1px;overflow:hidden'; hapt.innerHTML = '<input type="checkbox" switch>'; document.body.appendChild(hapt); } hapt.click(); } } catch { }
+  try { boopAC ??= new (window.AudioContext || window.webkitAudioContext)(); if (boopAC.state === 'suspended') boopAC.resume(); const t = boopAC.currentTime; const o = boopAC.createOscillator(), gn = boopAC.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(ok ? 1250 : 330, t); if (ok) o.frequency.exponentialRampToValueAtTime(900, t + 0.07);
+    gn.gain.setValueAtTime(0.0001, t); gn.gain.exponentialRampToValueAtTime(0.25, t + 0.008); gn.gain.exponentialRampToValueAtTime(0.0001, t + (ok ? 0.09 : 0.18)); o.connect(gn).connect(boopAC.destination); o.start(t); o.stop(t + 0.2); } catch { }
+}
 // scan controls
-$$('#mode-seg button').forEach(b => b.onclick = () => { S.mode = b.dataset.mode; $$('#mode-seg button').forEach(x => x.classList.toggle('on', x === b)); $('#tg-auto').disabled = S.mode !== 'single'; if (S.mode !== 'single') setAuto(false); kvSet('mode', S.mode); });
-function setAuto(on) { S.auto = on; $('#tg-auto').setAttribute('aria-pressed', on); }
+$$('#mode-seg button').forEach(b => b.onclick = () => { S.mode = b.dataset.mode; $$('#mode-seg button').forEach(x => x.classList.toggle('on', x === b)); $('#tg-auto').disabled = $('#tg-fast').disabled = S.mode !== 'single'; if (S.mode !== 'single') { setAuto(false); setFast(false); } kvSet('mode', S.mode); });
+function setAuto(on) { S.auto = on; $('#tg-auto').setAttribute('aria-pressed', on); if (on && S.fast) setFast(false); }
 $('#tg-auto').onclick = () => setAuto(!S.auto);
 $('#tg-foil').onclick = e => { S.foil = !S.foil; e.currentTarget.setAttribute('aria-pressed', S.foil); toast(S.foil ? 'Next scans are saved as foil' : 'Next scans are saved as normal (non-foil)'); };
 
@@ -527,7 +621,7 @@ binder.on(() => { if (S.tab === 'binder') renderBinder(); if (S.tab === 'value')
   await Promise.all([loadDB(), binder.load()]);
   await loadMeta(db()).catch(e => console.warn('meta', e));
   await initDecks({ recordDeck, deckVideo, scanInto, deckToBinder, setDest: d => { if (!d && S.dest.deck) setDest(null); } });
-  renderDest(); loadJob().catch(() => {}); if (await kvGet('priceMode')) setPrice(true);
+  renderDest(); loadJob().catch(e => console.warn(e)); if (await kvGet('priceMode')) setPrice(true); if (await kvGet('fast') && S.mode === 'single') setFast(true);
   engine().catch(() => {});
   if (await kvGet('camOK')) startCam();
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -554,7 +648,7 @@ $('#tg-rec').onclick = () => S.rec ? stopRec() : startRec();
 async function startRec() {
   if (!S.stream) await startCam(); if (!S.stream) return;
   setAuto(false); engine();
-  const type = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'].find(t => window.MediaRecorder?.isTypeSupported?.(t));
+  const type = ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(t => window.MediaRecorder?.isTypeSupported?.(t));
   try { recorder = new MediaRecorder(S.stream, { mimeType: type, videoBitsPerSecond: 8e6 }); } catch (e) { toast('Recording isn’t supported here — use Video instead'); return; }
   recChunks = []; recorder.ondataavailable = e => e.data.size && recChunks.push(e.data);
   const dest = S.dest.deck ? { deck: S.dest.deck } : null;
@@ -563,68 +657,151 @@ async function startRec() {
 }
 function stopRec() { if (recorder && recorder.state !== 'inactive') recorder.stop(); setRecUI(false); }
 $('#vid-in').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (f) runRecord(f, S.dest.deck ? { deck: S.dest.deck } : null); };
-// A video is read in the background: close the sheet any time, a pill shows progress and reopens the results.
-const JOB = { state: 'idle', pct: 0, msg: '', ac: null, items: [], dest: null };
+// ---------- Video jobs
+// The clip is saved to the phone (IndexedDB) the moment you stop recording or pick a video, then read with checkpoints.
+// Leave the app, lock the phone, or even close it: when you come back it picks up where it stopped (iOS freezes web pages
+// in the background, so nothing can run while you're away; Android keeps going for a while). Confident cards go straight
+// into the binder as one batch (Last scan); unsure ones wait in the pill to be checked.
+const JOB = { state: 'idle', pct: 0, msg: '', ac: null, items: [], dest: null, meta: null, beat: 0, err: '' };
 function pill() {
-  const el = $('#job-pill');
-  if (JOB.state === 'running') { el.hidden = false; el.className = 'job-pill run'; el.textContent = `Reading video… ${Math.round(JOB.pct * 100)}%`; }
-  else if (JOB.state === 'done' && JOB.items.length) { el.hidden = false; el.className = 'job-pill'; el.textContent = `${JOB.items.length} card${JOB.items.length === 1 ? '' : 's'} to review ›`; }
+  const el = $('#job-pill'); const p = Math.round(JOB.pct * 100);
+  if (JOB.state === 'running') { el.hidden = false; el.className = 'job-pill run'; el.textContent = document.hidden || JOB.paused ? `Video paused at ${p}% · resumes here` : `Reading video… ${p}%`; }
+  else if (JOB.state === 'error') { el.hidden = false; el.className = 'job-pill run'; el.textContent = `Video stopped at ${p}% · tap to retry`; }
+  else if (JOB.state === 'done' && JOB.items.length) { el.hidden = false; el.className = 'job-pill'; el.textContent = `${JOB.items.length} card${JOB.items.length === 1 ? '' : 's'} to check ›`; }
   else el.hidden = true;
 }
 $('#job-pill').onclick = () => openJob();
 // results must survive a reload: if storage fails, say so (the in-memory review still works)
-const saveJob = () => kvSetRequired('videoJob', JOB.state === 'done' && JOB.items.length ? { at: Date.now(), items: JOB.items.map(i => ({ ...i, print: i.print.id, alts: i.alts.slice(0, 20).map(a => a.id) })) } : null)
+const saveJob = () => kvSetRequired('videoJob', JOB.state === 'done' && JOB.items.length ? { at: Date.now(), dest: JOB.dest, items: JOB.items.map(i => ({ ...i, print: i.print.id, alts: i.alts.slice(0, 20).map(a => a.id) })) } : null)
   .catch(() => { status('Video results couldn’t be saved — add them before closing'); toast('Phone storage full: add these results before closing the app', null, 6000); });
+const saveClipMeta = m => kvSetRequired('clipJob', m).catch(() => {});
+// the clip itself: stored as a Blob, or in 8 MB pieces where the browser can't store Blobs in IndexedDB
+async function saveClip(id, blob) {
+  try { await kvSetRequired('clip:' + id, blob); const back = await kvGet('clip:' + id); if (back && back.size === blob.size) return true; } catch { }
+  const CH = 8 << 20, n = Math.ceil(blob.size / CH);
+  for (let i = 0; i < n; i++) await kvSetRequired(`clip:${id}:${i}`, await blob.slice(i * CH, Math.min(blob.size, (i + 1) * CH)).arrayBuffer());
+  await kvSetRequired('clip:' + id, { chunks: n, type: blob.type, size: blob.size }); return true;
+}
+async function loadClip(id) {
+  const v = await kvGet('clip:' + id); if (!v) return null; if (v instanceof Blob) return v;
+  const parts = []; for (let i = 0; i < v.chunks; i++) { const b = await kvGet(`clip:${id}:${i}`); if (!b) return null; parts.push(b); }
+  return new Blob(parts, { type: v.type });
+}
+async function delClip(id) { const v = await kvGet('clip:' + id); if (v?.chunks) for (let i = 0; i < v.chunks; i++) kvDel(`clip:${id}:${i}`); kvDel('clip:' + id); }
+let ckptAt = 0, ckptPending = null;
 async function loadJob() {
-  const j = await kvGet('videoJob'); if (!j?.items?.length) return;
-  JOB.items = j.items.map(i => ({ ...i, print: db().byId.get(i.print), alts: (i.alts || []).map(id => db().byId.get(id)).filter(Boolean) })).filter(i => i.print);
-  if (JOB.items.length) { JOB.state = 'done'; pill(); }
+  const j = await kvGet('videoJob');
+  if (j?.items?.length) { JOB.items = j.items.map(i => ({ ...i, print: db().byId.get(i.print), alts: (i.alts || []).map(id => db().byId.get(id)).filter(Boolean) })).filter(i => i.print); JOB.dest = j.dest || null; if (JOB.items.length) { JOB.state = 'done'; pill(); } }
+  const m = await kvGet('clipJob'); if (!m) return;
+  const clip = await loadClip(m.id); if (!clip) { saveClipMeta(null); return; }
+  JOB.meta = m; JOB.pct = m.pct || 0;
+  if (m.failed) { JOB.state = 'error'; JOB.err = m.err || ''; pill(); return; }
+  toast(`Continuing your video from ${Math.round(JOB.pct * 100)}%`, null, 4000);
+  runJob(m, clip);
 }
 function openJob() {
   if (JOB.state === 'running') {
-    openSheet(`<h3>Reading your video…</h3><div class="sub small">You can close this — it keeps going. Tap the pill to come back.</div><div class="prog"><i id="rp" style="width:${JOB.pct * 100}%"></i></div><div id="rs" class="sub small">${esc(JOB.msg)}</div>
-      <div class="btn-row"><button class="btn" id="rh">Keep going in background</button><button class="btn ghost warnc" id="rc">Cancel</button></div>`, root => {
+    const notif = 'Notification' in window && Notification.permission === 'default';
+    openSheet(`<h3>Reading your video…</h3><div class="sub small">Your clip is saved on this phone. Close this, switch apps or lock the phone: it picks up where it left off when you come back to Card Binder. Confident cards go straight into <b>${esc(JOB.meta?.binder || DEFAULT_BINDER)}</b>.</div><div class="prog"><i id="rp" style="width:${JOB.pct * 100}%"></i></div><div id="rs" class="sub small">${esc(JOB.msg)}</div>
+      <div class="btn-row"><button class="btn" id="rh">Keep going in background</button><button class="btn ghost warnc" id="rc">Cancel</button></div>${notif ? '<button class="btn ghost small" id="rn" style="margin-top:8px">Notify me when it’s done</button>' : ''}`, root => {
       root.querySelector('#rh').onclick = () => closeSheet();
-      root.querySelector('#rc').onclick = () => { JOB.ac?.abort(); closeSheet(); };
+      root.querySelector('#rc').onclick = () => { if (!confirm('Stop reading this video? The saved clip is deleted.')) return; JOB.cancel = true; JOB.ac?.abort(); closeSheet(); };
+      root.querySelector('#rn')?.addEventListener('click', e => { Notification.requestPermission().catch(() => {}); e.target.remove(); });
+    });
+  } else if (JOB.state === 'error') {
+    openSheet(`<h3>The video stopped at ${Math.round(JOB.pct * 100)}%</h3><p class="sub">${esc(JOB.err || 'Something went wrong reading it.')}</p><p class="sub small">The clip is still saved. Retry continues from where it stopped.</p>
+      <div class="btn-row"><button class="btn primary" id="rr">Retry</button><button class="btn ghost warnc" id="rd">Discard clip</button></div>`, root => {
+      root.querySelector('#rr').onclick = async () => { closeSheet(); const clip = await loadClip(JOB.meta.id); if (!clip) { toast('The saved clip is gone — record it again'); dropClip(); return; } JOB.meta.failed = false; JOB.meta.attempts = 0; runJob(JOB.meta, clip); };
+      root.querySelector('#rd').onclick = () => { dropClip(); closeSheet(); };
     });
   } else if (JOB.state === 'done') showReview();
 }
+function dropClip() { const m = JOB.meta; if (m) delClip(m.id); saveClipMeta(null); JOB.meta = null; if (JOB.state === 'error') JOB.state = JOB.items.length ? 'done' : 'idle'; pill(); }
 async function runRecord(blob, dest = null) {
   if (JOB.state === 'running') return toast('Already reading a video — tap the pill');
-  if (!dest && JOB.state === 'done' && JOB.items.length && !confirm(`You still have ${JOB.items.length} cards to review from the last video. Replace them?`)) return;
-  const prevItems = JOB.items; const ac = new AbortController(); Object.assign(JOB, { state: 'running', pct: 0, msg: 'Starting…', ac, items: [], dest }); pill(); openJob();
+  if (JOB.state === 'error' && !confirm('An earlier video didn’t finish. Discard it and read this one?')) return;
+  if (JOB.state === 'error') dropClip();
+  const mode = dest?.deck || S.mode === 'single' ? 'deck' : 'sweep';
+  const m = { id: Date.now().toString(36), dest, mode, binder: S.dest.binder || DEFAULT_BINDER, size: blob.size, type: blob.type, at: Date.now(), pct: 0, ckpt: null, attempts: 0 };
+  let saved = true; try { await saveClip(m.id, blob); await kvSetRequired('clipJob', m); } catch { saved = false; }
+  if (!saved) toast('Not enough phone storage to save the clip — keep the app open until it finishes', null, 6000);
+  runJob(m, blob, true);
+}
+let wake = null;
+const wakeOn = async () => { try { if (!wake && navigator.wakeLock && !document.hidden) { wake = await navigator.wakeLock.request('screen'); wake.addEventListener('release', () => { wake = null; }); } } catch { } };
+const wakeOff = () => { try { wake?.release(); } catch { } wake = null; };
+document.addEventListener('visibilitychange', () => {
+  if (S.rec && document.hidden) stopRec(); // leaving the app while recording: keep what was filmed and read it
+  if (JOB.state !== 'running') return;
+  if (document.hidden) { JOB.hiddenAt = Date.now(); if (ckptPending) { saveClipMeta(ckptPending); ckptPending = null; } }
+  else { JOB.beat = performance.now(); wakeOn(); }
+  pill();
+});
+async function runJob(m, blob, fresh = false) {
+  const ac = new AbortController(); JOB.meta = m; JOB.cancel = false; JOB.paused = false;
+  Object.assign(JOB, { state: 'running', pct: m.pct || 0, msg: m.ckpt ? 'Picking up where it stopped…' : 'Starting…', ac, dest: m.dest, beat: performance.now() }); pill(); if (fresh) openJob();
+  wakeOn();
+  const onProgress = (f, msg) => { JOB.pct = f; JOB.msg = msg; JOB.beat = performance.now(); pill(); const p = $('#rp'), q = $('#rs'); if (p) p.style.width = (f * 100).toFixed(0) + '%'; if (q) q.textContent = msg; };
+  const onCheckpoint = ck => { m.ckpt = ck; m.pct = ck.pct; JOB.beat = performance.now(); ckptPending = m; if (Date.now() - ckptAt > 1500) { ckptAt = Date.now(); ckptPending = null; return saveClipMeta(m); } };
+  // watchdog: no progress for 45 s while the app is open means something is stuck: restart from the last checkpoint
+  const dog = setInterval(() => { if (!document.hidden && performance.now() - JOB.beat > 45000) { JOB.stalled = true; ac.abort(); } }, 5000);
+  let r = null, err = null;
   try {
     const idf = await engine(); const { processVideo, processDeck } = await import('./record.js');
-    const onProgress = (f, msg) => { JOB.pct = f; JOB.msg = msg; pill(); const p = $('#rp'), m = $('#rs'); if (p) p.style.width = (f * 100).toFixed(0) + '%'; if (m) m.textContent = msg; };
-    const deckMode = !!dest?.deck || S.mode === 'single';
-    const r = deckMode ? await processDeck(idf, blob, { signal: ac.signal, onProgress }) : await processVideo(idf, blob, { signal: ac.signal, onProgress });
-    const items = r.cards.map(c => ({ id: Math.random().toString(36).slice(2), print: c.match, alts: c.alts || [], conf: c.conf, amb: !!c.printAmbiguous, finish: chooseFinish(c.match), qty: 1, on: c.conf !== 'low', thumb: thumbOf(c.cardCanvas) }));
-    navigator.vibrate?.([40, 60, 40]);
-    if (dest?.deck) { // straight into the deck; unsure ones are marked "check"
-      const d = getDeck(dest.deck); Object.assign(JOB, { state: prevItems.length ? 'done' : 'idle', items: prevItems }); pill();
-      if (!d) return; if (!items.length) return openSheet('<h3>No cards found</h3><p class="sub">Deal one card at a time, fill most of the screen, pause about half a second, and avoid glare.</p>');
-      const { r: res } = addToDeck(d, items.map(i => ({ print: i.print, finish: i.finish, qty: 1, conf: i.conf === 'low' ? 'low' : 'high', thumb: i.thumb, alts: i.alts.slice(0, 12).map(a => a.id) })), { quiet: true });
-      if (res.issues.some(i => i.name)) alertBuzz('warn');
-      closeSheet(); D.cur = d.id; show('decks'); toast(`Read ${items.length} cards in ${(r.ms / 1000).toFixed(0)}s${res.issues.length ? ` · ${res.issues.length} alert${res.issues.length > 1 ? 's' : ''}` : ' · deck is legal'}`, null, 5000); return;
-    }
-    JOB.items = items; JOB.state = 'done'; await saveJob(); pill();
-    if (!JOB.items.length) { JOB.state = 'idle'; pill(); openSheet('<h3>No cards found</h3><p class="sub">Hold each card or page still for about a second, fill most of the screen, and avoid glare.</p>'); }
-    else if (sheetOpen() && $('#rp')) showReview(); else toast(`Video done: ${JOB.items.length} cards to review`, null);
-  } catch (e) {
-    const cancelled = ac.signal.aborted; Object.assign(JOB, { state: prevItems.length ? 'done' : 'idle', items: prevItems }); pill();
-    if (cancelled) toast('Video cancelled'); else { console.error(e); openSheet(`<h3>Couldn’t read that video</h3><p class="sub">${esc(e.message)}</p>`); }
+    if (m.mode === 'deck') r = await processDeck(idf, blob, { signal: ac.signal, onProgress, onCheckpoint, resume: m.ckpt });
+    else r = await processVideo(idf, blob, { signal: ac.signal, onProgress, onCheckpoint, resume: m.ckpt?.phase === 2 ? m.ckpt : null });
+  } catch (e) { err = e; }
+  clearInterval(dog); wakeOff();
+  if (ckptPending) { await saveClipMeta(ckptPending); ckptPending = null; }
+  if (err) {
+    if (JOB.cancel) { dropClip(); Object.assign(JOB, { state: JOB.items.length ? 'done' : 'idle' }); pill(); toast('Video cancelled'); return; }
+    const wasAway = JOB.hiddenAt && Date.now() - JOB.hiddenAt < 120000; const stalled = JOB.stalled; JOB.stalled = false; JOB.hiddenAt = 0;
+    console.warn('video job', err);
+    // the phone may kill the decoder while the app is in the background; that's not a real failure: just continue
+    if (!wasAway) m.attempts = (m.attempts || 0) + 1;
+    if (m.attempts <= 2) { if (stalled) toast('Video got stuck — restarting from ' + Math.round(JOB.pct * 100) + '%', null, 3000); await saveClipMeta(m); return runJob(m, blob); }
+    m.failed = true; m.err = err.message; await saveClipMeta(m); Object.assign(JOB, { state: 'error', err: err.message }); pill();
+    if (!document.hidden) openJob();
+    return;
   }
+  // finished: confident cards into the binder (or deck), unsure ones to check
+  const items = r.cards.map(c => ({ id: Math.random().toString(36).slice(2), print: c.match, alts: c.alts || [], conf: c.conf, amb: !!c.printAmbiguous, finish: chooseFinish(c.match), qty: 1, on: c.conf !== 'low', thumb: c.thumb || thumbOf(c.cardCanvas) }));
+  navigator.vibrate?.([40, 60, 40]);
+  const done = msg => { delClip(m.id); saveClipMeta(null); JOB.meta = null; notifyDone(msg); };
+  if (m.dest?.deck) { // straight into the deck; unsure ones are marked "check"
+    const d = getDeck(m.dest.deck); Object.assign(JOB, { state: JOB.items.length ? 'done' : 'idle' }); pill();
+    if (!d) return done('Video finished');
+    if (!items.length) { done('No cards found in the video'); return openSheet('<h3>No cards found</h3><p class="sub">Deal one card at a time, fill most of the screen, pause about half a second, and avoid glare.</p>'); }
+    const { r: res } = addToDeck(d, items.map(i => ({ print: i.print, finish: i.finish, qty: 1, conf: i.conf === 'low' ? 'low' : 'high', thumb: i.thumb, alts: i.alts.slice(0, 12).map(a => a.id) })), { quiet: true });
+    if (res.issues.some(i => i.name)) alertBuzz('warn');
+    done(`Deck video: ${items.length} cards read`);
+    closeSheet(); D.cur = d.id; show('decks'); toast(`Read ${items.length} cards in ${(r.ms / 1000).toFixed(0)}s${res.issues.length ? ` · ${res.issues.length} alert${res.issues.length > 1 ? 's' : ''}` : ' · deck is legal'}`, null, 5000); return;
+  }
+  const sure = items.filter(i => i.on), unsure = items.filter(i => !i.on); const bname = m.binder || DEFAULT_BINDER;
+  if (sure.length) {
+    const b = batchId(true); JOB.batch = b; await binder.add(sure.map(i => ({ print: i.print, finish: i.finish, qty: i.qty, binder: bname, batch: b })), `Video (${sure.length})`);
+    S.tray = [...sure.map(i => ({ ...i, added: true, dest: { binder: bname } })), ...S.tray].slice(0, 60); renderTray(); renderDest();
+  }
+  JOB.items = [...unsure, ...(JOB.items || [])]; JOB.dest = { binder: bname }; JOB.state = JOB.items.length ? 'done' : 'idle'; await saveJob(); pill();
+  const msg = `Video done: ${sure.length} card${sure.length === 1 ? '' : 's'} added to ${bname}${unsure.length ? ` · ${unsure.length} to check` : ''}`;
+  done(msg);
+  if (!items.length) openSheet('<h3>No cards found</h3><p class="sub">Hold each card or page still for about a second, fill most of the screen, and avoid glare.</p>');
+  else { if (sheetOpen() && $('#rp')) closeSheet(); toast(msg, sure.length ? undoLast : null, 7000); }
+}
+function notifyDone(msg) {
+  try { navigator.setAppBadge?.(JOB.items.length || 0).catch?.(() => {}); } catch { }
+  if (document.hidden && 'Notification' in window && Notification.permission === 'granted') navigator.serviceWorker?.ready.then(reg => reg.showNotification('Card Binder', { body: msg, tag: 'video-job', icon: 'icons/icon-192.png' })).catch(() => {});
 }
 function showReview() {
   const items = JOB.items;
   const draw = root => {
     const on = items.filter(i => i.on); const val = on.reduce((s, i) => s + (priceOf(i.print, i.finish) || 0) * i.qty, 0);
-    root.innerHTML = `<h3>${items.length} cards found</h3><div class="sub small">Amber = not sure (unchecked). Tap a card to fix it. Saved until you add or discard. Going into <b>${esc(S.dest.binder || DEFAULT_BINDER)}</b>.</div>
+    root.innerHTML = `<h3>${items.length} card${items.length === 1 ? '' : 's'} to check</h3><div class="sub small">Not sure about these. Tap a card to fix it, tick the right ones, then add. Saved until you add or discard. Going into <b>${esc(JOB.dest?.binder || S.dest.binder || DEFAULT_BINDER)}</b>.</div>
       <div class="rv">${items.map(i => `<div class="rv-it ${i.conf}${i.amb ? ' amb' : ''}" data-id="${i.id}"><input type="checkbox" ${i.on ? 'checked' : ''} aria-label="Include"><img src="${img(i.print, 'small')}" alt="" loading="lazy">
       <div class="nmc"><b>${esc(short(i.print.name))}</b><div class="sub small">${esc(i.print.set.toUpperCase())} #${esc(i.print.cn)}${isOldFrame(i.print) ? ' · old' : ''}${i.finish !== 'nonfoil' ? ' · ' + i.finish : ''} · ${money(priceOf(i.print, i.finish))}${i.amb ? ' · check printing' : ''}</div></div>
       <div class="q"><button data-d="-1" aria-label="Fewer">−</button><span>${i.qty}</span><button data-d="1" aria-label="More">+</button></div></div>`).join('')}</div>
       <button class="btn big primary" id="rv-add" ${on.length ? '' : 'disabled'}>Add ${on.reduce((s, i) => s + i.qty, 0)} to binder · ${money(val)}</button>
-      <button class="btn ghost warnc" id="rv-discard" style="width:100%;margin-top:8px">Discard this video’s results</button>`;
+      <button class="btn ghost warnc" id="rv-discard" style="width:100%;margin-top:8px">Discard these</button>`;
     root.querySelectorAll('.rv-it').forEach(el => { const it = items.find(x => x.id === el.dataset.id);
       el.querySelector('input').onchange = e => { it.on = e.target.checked; saveJob(); draw(root); };
       el.querySelectorAll('.q button').forEach(b => b.onclick = e => { e.stopPropagation(); it.qty = Math.max(1, it.qty + +b.dataset.d); saveJob(); draw(root); });
@@ -633,9 +810,10 @@ function showReview() {
     const addBtn = root.querySelector('#rv-add');
     addBtn.onclick = async () => {
       addBtn.disabled = true; // no double-add
-      const add = items.filter(i => i.on); const b = batchId(true);
-      await binder.add(add.map(i => ({ print: i.print, finish: i.finish, qty: i.qty, binder: S.dest.binder || DEFAULT_BINDER, batch: b })), `Video (${add.length})`);
-      S.tray = [...add.map(i => ({ ...i, added: true, dest: { binder: S.dest.binder || DEFAULT_BINDER } })), ...S.tray].slice(0, 60); renderTray();
+      const add = items.filter(i => i.on); const b = JOB.batch ?? batchId(true);
+      const bn = JOB.dest?.binder || S.dest.binder || DEFAULT_BINDER;
+      await binder.add(add.map(i => ({ print: i.print, finish: i.finish, qty: i.qty, binder: bn, batch: b })), `Video (${add.length})`);
+      S.tray = [...add.map(i => ({ ...i, added: true, dest: { binder: bn } })), ...S.tray].slice(0, 60); renderTray();
       Object.assign(JOB, { state: 'idle', items: [] }); saveJob(); pill(); closeSheet(); renderDest();
       toast(`Added ${add.reduce((s, i) => s + i.qty, 0)} cards`, undoLast);
     };
