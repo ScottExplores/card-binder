@@ -31,4 +31,5 @@
 - e2e_videojob (Playwright): reload at 30% -> resumes from 24% checkpoint, 14 cards, no duplicates, clip cleaned up — Chrome (H.264 .mov) and WebKit (rotated HEVC .mov). Clip falls back to 8 MB ArrayBuffer chunks when IDB refuses Blobs.
 - All tests pass: unit + Commander 106/106, e2e, e2e_v2 (updated for auto-add), e2e_deck. Fast bench 4/s: 40/40, 0 wrong, 4.0 cards/s, 45 ms median. Screens in qa/v3/.
 - Server option: R2 not enabled on the Cloudflare account; would need R2 + Workers Paid/Containers (Scott decision).
-- TODO: deploy-next, push to GitHub branch next.
+- Deployed to https://next.card-binder-5zt.pages.dev (cache cb-next-9b1ad88); live untouched. Pushed GitHub ScottExplores/card-binder branch next (f01ce58).
+- Not done: real-iPhone test (needs Scott), Fast-scan read in a Worker (would help slow phones: 4x CPU throttle gives 75% capture at 3/s), server processing.
