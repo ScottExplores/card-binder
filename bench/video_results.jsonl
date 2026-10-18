@@ -3,3 +3,4 @@
 {"video":"bench/video1","thr":1,"duration":32.4,"truth":44,"found_checked":34,"correct_checked":34,"extra_checked":0,"found_any":38,"correct_any":34,"recall_checked":77.3,"process_s":111.4,"frames":162,"picked":25}
 {"video":"bench/video1","thr":1,"duration":32.4,"truth":44,"found_checked":28,"correct_checked":27,"extra_checked":1,"found_any":43,"correct_any":30,"recall_checked":61.4,"process_s":106,"frames":162,"picked":25}
 {"video":"bench/video2","thr":1,"duration":32.3,"truth":44,"found_checked":38,"correct_checked":37,"extra_checked":1,"found_any":42,"correct_any":37,"recall_checked":84.1,"process_s":106.8,"frames":162,"picked":21}
+{"video":"bench/video2","thr":1,"duration":32.3,"truth":44,"found_checked":37,"correct_checked":37,"extra_checked":0,"found_any":43,"correct_any":37,"recall_checked":84.1,"process_s":104.7,"frames":162,"picked":21}

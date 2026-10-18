@@ -12,5 +12,5 @@
 - Test deploy (deploy-next.sh, branch next); screens/v2-*.png
 
 ## Next / left
-- Video-sweep regression check (bench/video.mjs bench/video2) after dedupe change
+- (done) Video-sweep regression: video2 84.1% recall, 0 extras (was 84.1%, 1 extra)
 - Not done: real phone photos (none available), eBay sold price API (no free keyless one; link only), TCGplayer product IDs, companion picker UI, price alerts, per-batch condition
